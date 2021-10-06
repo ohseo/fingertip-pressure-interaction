@@ -18,7 +18,7 @@ public class LinearGaugeManager : MonoBehaviour
 
     private void LoadCalibrationData()
     {
-        if (myo != null)
+        if (myo != null && myo.internalMyo != null)
         {
             EMGDataSaveSystem.LoadData(myo.internalMyo.emgFilter);
         }
