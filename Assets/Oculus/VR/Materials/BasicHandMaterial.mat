@@ -21,10 +21,11 @@ Material:
     m_TexEnvs: []
     m_Floats:
     - _FresnelPower: 0.215
-    - _HandAlpha: 1
+    - _HandAlpha: 0.6
     - _MinVisibleAlpha: 0.164
     - _RimFactor: 0.922
     m_Colors:
     - _ColorBottom: {r: 0.3615441, g: 0.56082696, b: 0.8088235, a: 1}
     - _ColorPrimary: {r: 0.75735295, g: 0.75735295, b: 0.75735295, a: 1}
     - _ColorTop: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DefaultHandMaterial
-  m_Shader: {fileID: 4800000, guid: 8aba22c2208aff640a2fdc9a5e45a9dd, type: 3}
+  m_Name: DummyMaterial
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3001
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -60,26 +60,19 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FresnelPower: 0.215
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HandAlpha: 0.6
     - _Metallic: 0
-    - _MinVisibleAlpha: 0.164
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RimFactor: 0.922
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorBottom: {r: 0.36154413, g: 0.560827, b: 0.8088235, a: 1}
-    - _ColorPrimary: {r: 0.75735295, g: 0.75735295, b: 0.75735295, a: 1}
-    - _ColorTop: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.57992166, g: 0.7783541, b: 0.8490566, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

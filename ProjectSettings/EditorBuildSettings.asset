@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/OculusWithLinearGauge.unity
     guid: edbd0dbdb8684ea4b8993f900811554c
+  - enabled: 0
+    path: Assets/Oculus/SampleFramework/Usage/DistanceGrab.unity
+    guid: 24f58b3f0ca02d44eaec7f50bca538f2
+  - enabled: 0
+    path: Assets/Oculus/SampleFramework/Usage/CustomHands.unity
+    guid: a4f984fcee593d2418cc61f4a993d46d
+  - enabled: 0
+    path: Assets/Oculus/SampleFramework/Usage/HandsInteractionTrainScene.unity
+    guid: a9c41884ef0c347628dfd8a4af4a022e
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 6c5d5466eac553741a13c1890f2c7f2d,
       type: 2}
