@@ -94,10 +94,10 @@ public class OVRHand : MonoBehaviour,
 			IsSystemGestureInProgress = (_handState.Status & OVRPlugin.HandStatus.SystemGestureInProgress) != 0;
 			IsPointerPoseValid = (_handState.Status & OVRPlugin.HandStatus.InputStateValid) != 0;
 			IsDominantHand = (_handState.Status & OVRPlugin.HandStatus.DominantHand) != 0;
-			// PointerPose.localPosition = _handState.PointerPose.Position.FromFlippedZVector3f();
-			// PointerPose.localRotation = _handState.PointerPose.Orientation.FromFlippedZQuatf();
-			PointerPose.localPosition = _handState.RootPose.Position.FromFlippedZVector3f();
-			PointerPose.localRotation = _handState.RootPose.Orientation.FromFlippedZQuatf() * Quaternion.Euler(0,-90,0);
+			PointerPose.localPosition = _handState.PointerPose.Position.FromFlippedZVector3f();
+			PointerPose.localRotation = _handState.PointerPose.Orientation.FromFlippedZQuatf();
+			// PointerPose.localPosition = _handState.RootPose.Position.FromFlippedZVector3f();
+			// PointerPose.localRotation = _handState.RootPose.Orientation.FromFlippedZQuatf() * Quaternion.Euler(0,-90,0);
 			HandScale = _handState.HandScale;
 			HandConfidence = (TrackingConfidence)_handState.HandConfidence;
 
