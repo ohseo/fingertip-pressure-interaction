@@ -39,7 +39,8 @@ namespace OculusSampleFramework
 			get
 			{
 				// return _currPinchState == PinchState.PinchUp && _firstFocusedInteractable != null;
-				return _currPinchState == PinchPressState.PinchUp;
+				// return _currPinchState == PinchPressState.PinchUp;
+				return _currPinchState == PinchPressState.PressUp;
 			}
 		}
 
@@ -48,7 +49,8 @@ namespace OculusSampleFramework
 			get
 			{
 				// return _currPinchState == PinchState.PinchStay && _firstFocusedInteractable != null;
-				return _currPinchState == PinchPressState.PinchStay;
+				// return _currPinchState == PinchPressState.PinchStay;
+				return _currPinchState == PinchPressState.PressStay;
 			}
 		}
 
@@ -57,7 +59,8 @@ namespace OculusSampleFramework
 			get
 			{
 				// return _currPinchState == PinchState.PinchDown && _firstFocusedInteractable != null;
-				return _currPinchState == PinchPressState.PinchDown;
+				// return _currPinchState == PinchPressState.PinchDown;
+				_currPinchState == PinchPressState.PressDown;
 			}
 		}
 
