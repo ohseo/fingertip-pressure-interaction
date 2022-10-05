@@ -60,7 +60,7 @@ namespace OculusSampleFramework
 			{
 				// return _currPinchState == PinchState.PinchDown && _firstFocusedInteractable != null;
 				// return _currPinchState == PinchPressState.PinchDown;
-				_currPinchState == PinchPressState.PressDown;
+				return _currPinchState == PinchPressState.PressDown;
 			}
 		}
 
