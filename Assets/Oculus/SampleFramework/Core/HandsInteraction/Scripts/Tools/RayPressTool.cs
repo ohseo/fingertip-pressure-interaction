@@ -25,6 +25,7 @@ namespace OculusSampleFramework
 		private const int NUM_MAX_PRIMARY_HITS = 10;
 		private const int NUM_MAX_SECONDARY_HITS = 25;
 		private const int NUM_COLLIDERS_TO_TEST = 20;
+		private const float CD_GAIN = 0.5f;
 
 		[SerializeField] private RayToolView _rayToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
@@ -39,22 +40,23 @@ namespace OculusSampleFramework
 			}
 		}
 
-		private PinchStateModule _pinchStateModule = new PinchStateModule();
+		private PinchPressStateModule _pinchStateModule = new PinchPressStateModule();
 		private Interactable _focusedInteractable;
 
+		//Only 4 states are defined in ToolInputState
 		public override ToolInputState ToolInputState
 		{
 			get
 			{
-				if (_pinchStateModule.PinchDownOnFocusedObject)
+				if (_pinchStateModule.PressDownOnFocusedObject)
 				{
 					return ToolInputState.PrimaryInputDown;
 				}
-				if (_pinchStateModule.PinchSteadyOnFocusedObject)
+				if (_pinchStateModule.PressSteadyOnFocusedObject)
 				{
 					return ToolInputState.PrimaryInputDownStay;
 				}
-				if (_pinchStateModule.PinchUpAndDownOnFocusedObject)
+				if (_pinchStateModule.PressUpOnFocusedObject)
 				{
 					return ToolInputState.PrimaryInputUp;
 				}
@@ -115,7 +117,6 @@ namespace OculusSampleFramework
 
 			var hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
 			var pointer = hand.PointerPose;
-			// var pointer = hand.RootPose;
 			transform.position = pointer.position;
 			transform.rotation = pointer.rotation;
 
@@ -124,10 +125,19 @@ namespace OculusSampleFramework
 			Velocity = (currPosition - prevPosition) / Time.deltaTime;
 			InteractionPosition = currPosition;
 
-			_pinchStateModule.UpdateState(hand, _focusedInteractable);
-			_rayToolView.ToolActivateState = _pinchStateModule.PinchSteadyOnFocusedObject ||
-				_pinchStateModule.PinchDownOnFocusedObject;
+			_pinchStateModule.UpdateState(hand, _focusedInteractable, _gaugeManager);
+			// _pinchStateModule.UpdateState(hand, _focusedInteractable);
+			_rayToolView.ToolActivateState = _pinchStateModule.PressSteadyOnFocusedObject ||
+				_pinchStateModule.PressDownOnFocusedObject;
 			// _rayToolView.ToolActivateState = true;
+
+			// OSY RAY MODIFICATION HERE
+			if(!_pinchStateModule.NoPinch)
+			{
+				//test code
+				transform.rotation = pointer.rotation * Quaternion.Euler(0,-90,0);
+			}
+
 		}
 
 		/// <summary>
