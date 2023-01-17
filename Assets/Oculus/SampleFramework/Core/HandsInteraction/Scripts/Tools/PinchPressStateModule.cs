@@ -34,8 +34,9 @@ namespace OculusSampleFramework
 		/// While the latter is difficult to do since a person might focus nothing before
 		/// focusing on another interactable, it's theoretically possible.
 		/// </summary>
-		public bool PinchUpAndDownOnFocusedObject
+		public bool PressUpOnFocusedObject
 		{
+			//calls ToolInputState.PrimaryInputUp;	
 			get
 			{
 				// return _currPinchState == PinchState.PinchUp && _firstFocusedInteractable != null;
@@ -44,8 +45,9 @@ namespace OculusSampleFramework
 			}
 		}
 
-		public bool PinchSteadyOnFocusedObject
+		public bool PressSteadyOnFocusedObject
 		{
+			//calls ToolInputState.PrimaryInputDownStay;
 			get
 			{
 				// return _currPinchState == PinchState.PinchStay && _firstFocusedInteractable != null;
@@ -54,13 +56,22 @@ namespace OculusSampleFramework
 			}
 		}
 
-		public bool PinchDownOnFocusedObject
+		public bool PressDownOnFocusedObject
 		{
+			//calls ToolInputState.PrimaryInputDown;
 			get
 			{
 				// return _currPinchState == PinchState.PinchDown && _firstFocusedInteractable != null;
 				// return _currPinchState == PinchPressState.PinchDown;
 				return _currPinchState == PinchPressState.PressDown;
+			}
+		}
+
+		public bool NoPinch
+		{
+			get
+			{
+				return _currPinchState == PinchPressState.None;
 			}
 		}
 
@@ -71,16 +82,19 @@ namespace OculusSampleFramework
 		}
 
 		public void UpdateState(OVRHand hand, Interactable currFocusedInteractable, LinearGaugeManager gaugeManager)
+		// public void UpdateState(OVRHand hand, Interactable currFocusedInteractable)
 		{
 			float pinchStrength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
 			bool isPinching = Mathf.Abs(PINCH_STRENGTH_THRESHOLD - pinchStrength) < Mathf.Epsilon;
-			float pressStrength = gaugeManager.GetHandForce();
+			// float pressStrength = gaugeManager.GetHandForce();
+			float pressStrength = 0f;
 			bool isPressing = Mathf.Abs(PRESS_STRENGTH_THRESHOLD - pressStrength) < Mathf.Epsilon;
 			var oldPinchState = _currPinchState;
 
 			switch (oldPinchState)
 			{
 				case PinchPressState.PinchUp:
+					// Now in "Coarse Pointing State"
 					// can only be in pinch up for a single frame, so consider
 					// next frame carefully
 					if (isPinching)
@@ -100,8 +114,8 @@ namespace OculusSampleFramework
 				case PinchPressState.PinchStay:
 				case PinchPressState.PinchDown:
 				case PinchPressState.PressUp:
-					_currPinchState = isPressing ? PinchPressState.PressDown : PinchPressState.PinchStay;
-					_currPinchState = isPinching ? PinchPressState.PinchStay : PinchPressState.PinchUp;
+					// Now in "Precision Pointing State"
+					_currPinchState = isPinching ? (isPressing ? PinchPressState.PressDown : PinchPressState.PinchStay) : PinchPressState.PinchUp;
 					// if object is not focused anymore, then forget it
 					if (currFocusedInteractable != _firstFocusedInteractable)
 					{
@@ -110,6 +124,7 @@ namespace OculusSampleFramework
 					break;
 				case PinchPressState.PressStay:
 				case PinchPressState.PressDown:
+					// Now in "Selecting State"
 					_currPinchState = isPressing ? PinchPressState.PressStay : PinchPressState.PressUp;
 					if (currFocusedInteractable != _firstFocusedInteractable)
 					{
