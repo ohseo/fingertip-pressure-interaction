@@ -96,6 +96,8 @@ namespace OculusSampleFramework
 			Assert.IsNotNull(_rayToolView);
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
 			_rayToolView.InteractableTool = this;
+			GameObject go = GameObject.Find("LinearGaugeManager");
+			_gaugeManager = go.GetComponent<LinearGaugeManager>();
 			_coneAngleReleaseDegrees = _coneAngleDegrees * 1.2f;
 			_initialized = true;
 		}
@@ -132,7 +134,7 @@ namespace OculusSampleFramework
 			// _rayToolView.ToolActivateState = true;
 
 			// OSY RAY MODIFICATION HERE
-			if(!_pinchStateModule.NoPinch)
+			if(!_pinchStateModule.NoPress)
 			{
 				//test code
 				transform.rotation = pointer.rotation * Quaternion.Euler(0,-90,0);

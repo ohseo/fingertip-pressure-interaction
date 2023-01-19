@@ -75,6 +75,16 @@ namespace OculusSampleFramework
 			}
 		}
 
+		public bool NoPress
+		{
+			get
+			{
+				return (_currPinchState != PinchPressState.PressDown) &&
+					(_currPinchState != PinchPressState.PressStay) &&
+					(_currPinchState != PinchPressState.PressUp);
+			}
+		}
+
 		public PinchPressStateModule()
 		{
 			_currPinchState = PinchPressState.None;
@@ -86,9 +96,9 @@ namespace OculusSampleFramework
 		{
 			float pinchStrength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
 			bool isPinching = Mathf.Abs(PINCH_STRENGTH_THRESHOLD - pinchStrength) < Mathf.Epsilon;
-			// float pressStrength = gaugeManager.GetHandForce();
-			float pressStrength = 0f;
-			bool isPressing = Mathf.Abs(PRESS_STRENGTH_THRESHOLD - pressStrength) < Mathf.Epsilon;
+			float pressStrength = gaugeManager.GetHandForce();
+			// float pressStrength = 0f;
+			bool isPressing = Mathf.Abs(PRESS_STRENGTH_THRESHOLD - pressStrength) > Mathf.Epsilon;
 			var oldPinchState = _currPinchState;
 
 			switch (oldPinchState)
@@ -125,7 +135,7 @@ namespace OculusSampleFramework
 				case PinchPressState.PressStay:
 				case PinchPressState.PressDown:
 					// Now in "Selecting State"
-					_currPinchState = isPressing ? PinchPressState.PressStay : PinchPressState.PressUp;
+					_currPinchState = (isPressing && isPinching) ? PinchPressState.PressStay : PinchPressState.PressUp;
 					if (currFocusedInteractable != _firstFocusedInteractable)
 					{
 						_firstFocusedInteractable = null;

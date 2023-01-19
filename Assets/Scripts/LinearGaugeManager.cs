@@ -41,16 +41,13 @@ public class LinearGaugeManager : MonoBehaviour
             {
                 _text.text = handForce.ToString();
             }
-            // if (linearGauge != null)
-            // {
-            //     linearGauge.value = handForce;
-            // }
         }
     }
 
     public float GetHandForce()
     {
-        return handForce;
+        return 1f;
+        // return handForce;
     }
 
 }
