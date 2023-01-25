@@ -12,6 +12,7 @@ language governing permissions and limitations under the license.
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using TMPro;
 
 namespace OculusSampleFramework
 {
@@ -31,6 +32,8 @@ namespace OculusSampleFramework
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
 		[SerializeField] private float _farFieldMaxDistance = 5f;
 		[SerializeField] private LinearGaugeManager _gaugeManager = null;
+
+		private TextMeshProUGUI _text;
 
 		public override InteractableToolTags ToolTags
 		{
@@ -96,10 +99,10 @@ namespace OculusSampleFramework
 			Assert.IsNotNull(_rayToolView);
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
 			_rayToolView.InteractableTool = this;
-			GameObject go = GameObject.Find("LinearGaugeManager");
-			_gaugeManager = go.GetComponent<LinearGaugeManager>();
+			_gaugeManager = GameObject.Find("LinearGaugeManager").GetComponent<LinearGaugeManager>();
 			_coneAngleReleaseDegrees = _coneAngleDegrees * 1.2f;
 			_initialized = true;
+			_text = GameObject.Find("Canvas/pressState").GetComponent<TextMeshProUGUI>();
 		}
 
 		private void OnDestroy()
@@ -139,6 +142,8 @@ namespace OculusSampleFramework
 				//test code
 				transform.rotation = pointer.rotation * Quaternion.Euler(0,-90,0);
 			}
+
+			_text.text = _pinchStateModule.currentPinchState;
 
 		}
 

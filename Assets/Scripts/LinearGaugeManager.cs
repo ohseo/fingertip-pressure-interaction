@@ -31,7 +31,8 @@ public class LinearGaugeManager : MonoBehaviour
     {
         if (myo != null && myo.internalMyo != null)
         {
-            handForce = myo.internalMyo.emgFilter.emg_weightedSum;
+            // handForce = myo.internalMyo.emgFilter.emg_weightedSum;
+            handForce = myo.internalMyo.emgFilter.emg_totalRMS;
 
             if (cube != null)
             {
@@ -46,8 +47,8 @@ public class LinearGaugeManager : MonoBehaviour
 
     public float GetHandForce()
     {
-        return 1f;
-        // return handForce;
+        // return 1f;
+        return handForce;
     }
 
 }
