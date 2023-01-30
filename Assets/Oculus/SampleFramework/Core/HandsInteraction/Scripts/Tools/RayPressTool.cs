@@ -26,9 +26,9 @@ namespace OculusSampleFramework
 		private const int NUM_MAX_PRIMARY_HITS = 10;
 		private const int NUM_MAX_SECONDARY_HITS = 25;
 		private const int NUM_COLLIDERS_TO_TEST = 20;
-		private const float CD_GAIN = 1.0f;
+		private const float CD_GAIN = 0.5f;
 
-		private const int RELATIVE_MODE = 2;
+		private const int RELATIVE_MODE = 3;
 
 		[SerializeField] private RayToolView _rayToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
@@ -177,6 +177,27 @@ namespace OculusSampleFramework
 						var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
 						transform.position = newPosition;
 						transform.forward = pinchDownForward;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+				}
+			} else if (RELATIVE_MODE == 3)
+			{
+				if(_pinchStateModule.IsPinchDown)
+				{
+					pinchDownPosition = transform.position;
+					pinchDownForward = transform.forward;
+					hasPinchDownSaved = true;
+				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
+						var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
+						newForward = Vector3.Normalize(newForward);
+						transform.position = newPosition;
+						transform.forward = newForward;
 					}
 				} else
 				{
