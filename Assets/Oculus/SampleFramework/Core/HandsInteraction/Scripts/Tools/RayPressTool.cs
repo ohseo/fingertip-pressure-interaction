@@ -26,7 +26,9 @@ namespace OculusSampleFramework
 		private const int NUM_MAX_PRIMARY_HITS = 10;
 		private const int NUM_MAX_SECONDARY_HITS = 25;
 		private const int NUM_COLLIDERS_TO_TEST = 20;
-		private const float CD_GAIN = 0.5f;
+		private const float CD_GAIN = 1.0f;
+
+		private const int RELATIVE_MODE = 2;
 
 		[SerializeField] private RayToolView _rayToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
@@ -34,6 +36,10 @@ namespace OculusSampleFramework
 		[SerializeField] private LinearGaugeManager _gaugeManager = null;
 
 		private TextMeshProUGUI _text;
+
+		private bool hasPinchDownSaved = false;
+		private Vector3 pinchDownPosition;
+		private Vector3 pinchDownForward;
 
 		public override InteractableToolTags ToolTags
 		{
@@ -137,11 +143,52 @@ namespace OculusSampleFramework
 			// _rayToolView.ToolActivateState = true;
 
 			// OSY RAY MODIFICATION HERE
-			if(!_pinchStateModule.NoPress)
+			if(RELATIVE_MODE == 1)
 			{
-				//test code
-				transform.rotation = pointer.rotation * Quaternion.Euler(0,-90,0);
+				if(_pinchStateModule.IsPinchDown)
+				{
+					pinchDownPosition = transform.position;
+					pinchDownForward = transform.forward;
+					hasPinchDownSaved = true;
+				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
+						newForward = Vector3.Normalize(newForward);
+						transform.forward = newForward;
+						transform.position = pinchDownPosition;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+				}
+			} else if (RELATIVE_MODE == 2)
+			{
+				if(_pinchStateModule.IsPinchDown)
+				{
+					pinchDownPosition = transform.position;
+					pinchDownForward = transform.forward;
+					hasPinchDownSaved = true;
+				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
+						transform.position = newPosition;
+						transform.forward = pinchDownForward;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+				}
 			}
+
+			// if(!_pinchStateModule.NoPress)
+			// {
+			// 	//test code
+			// 	transform.rotation = pointer.rotation * Quaternion.Euler(0,-90,0);
+			// }
 
 			_text.text = _pinchStateModule.currentPinchState;
 

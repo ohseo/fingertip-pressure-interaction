@@ -11,7 +11,7 @@ namespace OculusSampleFramework
 	public class PinchPressStateModule
 	{
 		private const float PINCH_STRENGTH_THRESHOLD = 1.0f;
-		private const float PRESS_STRENGTH_THRESHOLD = 0.1f;
+		private const float PRESS_STRENGTH_THRESHOLD = 0.07f;
 
 		private enum PinchPressState
 		{
@@ -67,21 +67,19 @@ namespace OculusSampleFramework
 			}
 		}
 
-		public bool NoPinch
+		public bool IsPinchDown
+		{
+			get
+			{
+				return _currPinchState == PinchPressState.PinchDown;
+			}
+		}
+
+		public bool NotPinching
 		{
 			get
 			{
 				return _currPinchState == PinchPressState.None;
-			}
-		}
-
-		public bool NoPress
-		{
-			get
-			{
-				return (_currPinchState != PinchPressState.PressDown) &&
-					(_currPinchState != PinchPressState.PressStay) &&
-					(_currPinchState != PinchPressState.PressUp);
 			}
 		}
 
