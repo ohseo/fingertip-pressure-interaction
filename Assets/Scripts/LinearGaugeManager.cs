@@ -36,7 +36,7 @@ public class LinearGaugeManager : MonoBehaviour
 
             if (cube != null)
             {
-                cube.transform.localScale = new Vector3(handForce * 0.1f, handForce * 0.1f, handForce * 0.1f);
+                cube.transform.localScale = new Vector3(handForce * 0.2f, handForce * 0.2f, handForce * 0.2f);
             }
             if(_text != null)
             {

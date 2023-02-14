@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4018075546172828}
-  - component: {fileID: 114332492007034412}
+  - component: {fileID: 6438454250529176374}
   - component: {fileID: 120032820719270462}
   m_Layer: 0
-  m_Name: RayToolView
+  m_Name: RayPressToolView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 4212808563549492}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114332492007034412
+--- !u!114 &6438454250529176374
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1347033447090706}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4e71869e3ccfde47a7a16e2f483b328, type: 3}
+  m_Script: {fileID: 11500000, guid: faa811fd3f560e04590f901595a7c2a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 4926998750941526}
@@ -198,7 +198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d9e849091264141aa2fcea9bc59f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rayToolView: {fileID: 114332492007034412}
+  _rayToolView: {fileID: 6438454250529176374}
   _coneAngleDegrees: 20
   _farFieldMaxDistance: 7
   _gaugeManager: {fileID: 250182845823487022, guid: c77702986c742e744b30d447d50f954c,

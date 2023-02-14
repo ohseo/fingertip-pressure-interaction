@@ -26,11 +26,11 @@ namespace OculusSampleFramework
 		private const int NUM_MAX_PRIMARY_HITS = 10;
 		private const int NUM_MAX_SECONDARY_HITS = 25;
 		private const int NUM_COLLIDERS_TO_TEST = 20;
-		private const float CD_GAIN = 0.5f;
+		private const float CD_GAIN = 0.25f;
 
 		private const int RELATIVE_MODE = 3;
 
-		[SerializeField] private RayToolView _rayToolView = null;
+		[SerializeField] private RayPressToolView _rayToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
 		[SerializeField] private float _farFieldMaxDistance = 5f;
 		[SerializeField] private LinearGaugeManager _gaugeManager = null;
@@ -138,6 +138,7 @@ namespace OculusSampleFramework
 
 			_pinchStateModule.UpdateState(hand, _focusedInteractable, _gaugeManager);
 			// _pinchStateModule.UpdateState(hand, _focusedInteractable);
+			_rayToolView.RelativeActivateState = !_pinchStateModule.NotPinching;
 			_rayToolView.ToolActivateState = _pinchStateModule.PressSteadyOnFocusedObject ||
 				_pinchStateModule.PressDownOnFocusedObject;
 			// _rayToolView.ToolActivateState = true;

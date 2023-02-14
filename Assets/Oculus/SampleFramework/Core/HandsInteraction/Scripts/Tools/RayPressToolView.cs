@@ -47,13 +47,24 @@ namespace OculusSampleFramework
 			set
 			{
 				_toolActivateState = value;
-				_lineRenderer.colorGradient = _toolActivateState ? _highLightColorGradient : _oldColorGradient;
+				_lineRenderer.colorGradient = _toolActivateState ? _highLightColorGradient :
+					(_relativeActivateState ? _relativeColorGradient : _oldColorGradient);
+			}
+		}
+
+		private bool _relativeActivateState = false;
+		public bool RelativeActivateState
+		{
+			get { return _relativeActivateState; }
+			set
+			{
+				_relativeActivateState = value;
 			}
 		}
 
 		private Transform _focusedTransform = null;
 		private Vector3[] linePositions = new Vector3[NUM_RAY_LINE_POSITIONS];
-		private Gradient _oldColorGradient, _highLightColorGradient;
+		private Gradient _oldColorGradient, _relativeColorGradient, _highLightColorGradient;
 
 		private void Awake()
 		{
@@ -62,6 +73,12 @@ namespace OculusSampleFramework
 			_lineRenderer.positionCount = NUM_RAY_LINE_POSITIONS;
 
 			_oldColorGradient = _lineRenderer.colorGradient;
+			_relativeColorGradient = new Gradient();
+			_relativeColorGradient.SetKeys(
+			  new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.70f, 0.90f), 0.0f),
+		  new GradientColorKey(new Color(0.90f, 0.90f, 0.90f), 1.0f) },
+			  new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+			);
 			_highLightColorGradient = new Gradient();
 			_highLightColorGradient.SetKeys(
 			  new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.90f, 0.90f), 0.0f),
