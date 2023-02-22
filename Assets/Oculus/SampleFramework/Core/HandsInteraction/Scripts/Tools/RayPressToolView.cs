@@ -25,6 +25,8 @@ namespace OculusSampleFramework
 		[SerializeField] private Transform _targetTransform = null;
 		[SerializeField] private LineRenderer _lineRenderer = null;
 
+		[SerializeField] private GameObject _positionMarker = null;
+
 		public bool EnableState
 		{
 			get
@@ -68,8 +70,11 @@ namespace OculusSampleFramework
 
 		private void Awake()
 		{
+			_positionMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			_positionMarker.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 			Assert.IsNotNull(_targetTransform);
 			Assert.IsNotNull(_lineRenderer);
+			Assert.IsNotNull(_positionMarker);
 			_lineRenderer.positionCount = NUM_RAY_LINE_POSITIONS;
 
 			_oldColorGradient = _lineRenderer.colorGradient;
@@ -111,6 +116,11 @@ namespace OculusSampleFramework
 			  : myPosition + myForward * DEFAULT_RAY_CAST_DISTANCE;
 			var targetVector = targetPosition - myPosition;
 			var targetDistance = targetVector.magnitude;
+			// // OSY TEMP CODE
+			_positionMarker.transform.position = myPosition;
+			myPosition = myPosition - myForward * DEFAULT_RAY_CAST_DISTANCE;
+			// // OSY TEMP CODE END
+
 			var p0 = myPosition;
 			// make points in between based on my forward as opposed to targetvector
 			// this way the curve "bends" toward to target
