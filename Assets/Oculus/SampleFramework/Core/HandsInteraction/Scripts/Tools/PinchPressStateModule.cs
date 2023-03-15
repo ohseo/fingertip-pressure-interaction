@@ -11,7 +11,8 @@ namespace OculusSampleFramework
 	public class PinchPressStateModule
 	{
 		private const float PINCH_STRENGTH_THRESHOLD = 1.0f;
-		private const float PRESS_STRENGTH_THRESHOLD = 0.07f;
+		private const float PRESS_STRENGTH_THRESHOLD = 0.1f;
+		public float pressStrength { get; set; } = 0f;
 
 		private enum PinchPressState
 		{
@@ -102,7 +103,7 @@ namespace OculusSampleFramework
 		{
 			float pinchStrength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
 			bool isPinching = Mathf.Abs(PINCH_STRENGTH_THRESHOLD - pinchStrength) < Mathf.Epsilon;
-			float pressStrength = gaugeManager.GetHandForce();
+			pressStrength = gaugeManager.GetHandForce();
 			bool isPressing = (PRESS_STRENGTH_THRESHOLD - pressStrength) < Mathf.Epsilon;
 			var oldPinchState = _currPinchState;
 

@@ -26,9 +26,10 @@ namespace OculusSampleFramework
 		private const int NUM_MAX_PRIMARY_HITS = 10;
 		private const int NUM_MAX_SECONDARY_HITS = 25;
 		private const int NUM_COLLIDERS_TO_TEST = 20;
-		private const float CD_GAIN = 0.25f;
+		private readonly float[] CD_GAIN = {0.5f, 0.25f};
+		private const float PRESS_LOWER_THRESHOLD = 0.07f;
 
-		private const int RELATIVE_MODE = 3;
+		private const int RELATIVE_MODE = 4;
 
 		[SerializeField] private RayPressToolView _rayToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
@@ -40,6 +41,8 @@ namespace OculusSampleFramework
 		private bool hasPinchDownSaved = false;
 		private Vector3 pinchDownPosition;
 		private Vector3 pinchDownForward;
+		
+		private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
 
 		public override InteractableToolTags ToolTags
 		{
@@ -160,10 +163,74 @@ namespace OculusSampleFramework
 			// _rayToolView.ToolActivateState = true;
 
 			// OSY RAY MODIFICATION HERE
-			if(RELATIVE_MODE == 1)
-			{
+			// if(RELATIVE_MODE == 1)
+			// {
+			// 	if(_pinchStateModule.IsPinchDown)
+			// 	{
+			// 		pinchDownPosition = transform.position;
+			// 		pinchDownForward = transform.forward;
+			// 		hasPinchDownSaved = true;
+			// 	} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+			// 	{
+			// 		if(hasPinchDownSaved)
+			// 		{
+			// 			var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
+			// 			newForward = Vector3.Normalize(newForward);
+			// 			transform.forward = newForward;
+			// 			transform.position = pinchDownPosition;
+			// 		}
+			// 	} else
+			// 	{
+			// 		hasPinchDownSaved = false;
+			// 	}
+			// } else if (RELATIVE_MODE == 2)
+			// {
+			// 	if(_pinchStateModule.IsPinchDown)
+			// 	{
+			// 		pinchDownPosition = transform.position;
+			// 		pinchDownForward = transform.forward;
+			// 		hasPinchDownSaved = true;
+			// 	} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+			// 	{
+			// 		if(hasPinchDownSaved)
+			// 		{
+			// 			var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
+			// 			transform.position = newPosition;
+			// 			transform.forward = pinchDownForward;
+			// 		}
+			// 	} else
+			// 	{
+			// 		hasPinchDownSaved = false;
+			// 	}
+			// } else if (RELATIVE_MODE == 3)
+			// {
+			// 	if(_pinchStateModule.IsPinchDown)
+			// 	{
+			// 		pinchDownPosition = transform.position;
+			// 		pinchDownForward = transform.forward;
+			// 		hasPinchDownSaved = true;
+			// 	} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+			// 	{
+			// 		if(hasPinchDownSaved)
+			// 		{
+			// 			var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
+			// 			var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
+			// 			newForward = Vector3.Normalize(newForward);
+			// 			transform.position = newPosition;
+			// 			transform.forward = newForward;
+			// 		}
+			// 	} else
+			// 	{
+			// 		hasPinchDownSaved = false;
+			// 	}
+			// } else if (RELATIVE_MODE == 4)
+			// {
 				if(_pinchStateModule.IsPinchDown)
 				{
+					prevPointingPosition = transform.position;
+					prevPointingForward = transform.forward;
+					prevResultPosition = transform.position;
+					prevResultForward = transform.forward;
 					pinchDownPosition = transform.position;
 					pinchDownForward = transform.forward;
 					hasPinchDownSaved = true;
@@ -171,48 +238,20 @@ namespace OculusSampleFramework
 				{
 					if(hasPinchDownSaved)
 					{
-						var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
+						var cdgain = 0f;
+						if(_pinchStateModule.pressStrength < PRESS_LOWER_THRESHOLD)
+						{
+							cdgain = CD_GAIN[0];
+						} else {
+							cdgain = CD_GAIN[1];
+						}
+						var newPosition = (transform.position - prevPointingPosition) * cdgain + prevResultPosition;
+						var newForward = (transform.forward - prevPointingForward) * cdgain + prevResultForward;
 						newForward = Vector3.Normalize(newForward);
-						transform.forward = newForward;
-						transform.position = pinchDownPosition;
-					}
-				} else
-				{
-					hasPinchDownSaved = false;
-				}
-			} else if (RELATIVE_MODE == 2)
-			{
-				if(_pinchStateModule.IsPinchDown)
-				{
-					pinchDownPosition = transform.position;
-					pinchDownForward = transform.forward;
-					hasPinchDownSaved = true;
-				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
-				{
-					if(hasPinchDownSaved)
-					{
-						var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
-						transform.position = newPosition;
-						transform.forward = pinchDownForward;
-					}
-				} else
-				{
-					hasPinchDownSaved = false;
-				}
-			} else if (RELATIVE_MODE == 3)
-			{
-				if(_pinchStateModule.IsPinchDown)
-				{
-					pinchDownPosition = transform.position;
-					pinchDownForward = transform.forward;
-					hasPinchDownSaved = true;
-				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
-				{
-					if(hasPinchDownSaved)
-					{
-						var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
-						var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
-						newForward = Vector3.Normalize(newForward);
+						prevPointingPosition = transform.position;
+						prevPointingForward = transform.forward;
+						prevResultPosition = newPosition;
+						prevResultForward = newForward;
 						transform.position = newPosition;
 						transform.forward = newForward;
 					}
@@ -220,7 +259,7 @@ namespace OculusSampleFramework
 				{
 					hasPinchDownSaved = false;
 				}
-			}
+			// }
 
 			// if(!_pinchStateModule.NoPress)
 			// {
