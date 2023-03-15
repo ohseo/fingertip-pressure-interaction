@@ -1124,13 +1124,13 @@ PrefabInstance:
         type: 3}
       propertyPath: LeftHandTools.Array.data[0]
       value: 
-      objectReference: {fileID: 4212808563549492, guid: e7d83f48d103c6441a558c991219ec00,
+      objectReference: {fileID: 4212808563549492, guid: 50f797a2ff610ca4099b5cf42214abd5,
         type: 3}
     - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
         type: 3}
       propertyPath: LeftHandTools.Array.data[1]
       value: 
-      objectReference: {fileID: 4663491353866464, guid: 54e898404b081ae438d0b5d097aae07a,
+      objectReference: {fileID: 4663491353866464, guid: e31899e95dd510444a25c62c9acbeb05,
         type: 3}
     - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
         type: 3}
@@ -1160,13 +1160,13 @@ PrefabInstance:
         type: 3}
       propertyPath: RightHandTools.Array.data[0]
       value: 
-      objectReference: {fileID: 4212808563549492, guid: e7d83f48d103c6441a558c991219ec00,
+      objectReference: {fileID: 4212808563549492, guid: 50f797a2ff610ca4099b5cf42214abd5,
         type: 3}
     - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
         type: 3}
       propertyPath: RightHandTools.Array.data[1]
       value: 
-      objectReference: {fileID: 4663491353866464, guid: 54e898404b081ae438d0b5d097aae07a,
+      objectReference: {fileID: 4663491353866464, guid: e31899e95dd510444a25c62c9acbeb05,
         type: 3}
     - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
         type: 3}
