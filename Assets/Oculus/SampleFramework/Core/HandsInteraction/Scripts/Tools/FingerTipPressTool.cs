@@ -25,8 +25,12 @@ namespace OculusSampleFramework
 	{
 		private const int NUM_VELOCITY_FRAMES = 10;
 
-		[SerializeField] private FingerTipPressToolView _fingerTipPokeToolView = null;
+		[SerializeField] private FingerTipPressToolView _fingerTipPressToolView = null;
 		[SerializeField] private OVRPlugin.HandFinger _fingerToFollow = OVRPlugin.HandFinger.Index;
+
+		[SerializeField] private LinearGaugeManager _gaugeManager = null;
+
+		private readonly float[] PRESS_THRESHOLD = {0.08f, 0.16f};
 
 		public override InteractableToolTags ToolTags
 		{
@@ -54,11 +58,11 @@ namespace OculusSampleFramework
 		{
 			get
 			{
-				return _fingerTipPokeToolView.gameObject.activeSelf;
+				return _fingerTipPressToolView.gameObject.activeSelf;
 			}
 			set
 			{
-				_fingerTipPokeToolView.gameObject.SetActive(value);
+				_fingerTipPressToolView.gameObject.SetActive(value);
 			}
 		}
 
@@ -75,10 +79,11 @@ namespace OculusSampleFramework
 
 		public override void Initialize()
 		{
-			Assert.IsNotNull(_fingerTipPokeToolView);
+			Assert.IsNotNull(_fingerTipPressToolView);
 
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
-			_fingerTipPokeToolView.InteractableTool = this;
+			_fingerTipPressToolView.InteractableTool = this;
+			_gaugeManager = GameObject.Find("LinearGaugeManager").GetComponent<LinearGaugeManager>();
 
 			_velocityFrames = new Vector3[NUM_VELOCITY_FRAMES];
 			Array.Clear(_velocityFrames, 0, NUM_VELOCITY_FRAMES);
@@ -150,7 +155,7 @@ namespace OculusSampleFramework
 			Vector3 capsuleDirection = capsuleTransform.right;
 			Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 0.5f
 			  * capsuleDirection;
-			Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPokeToolView.SphereRadius *
+			Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPressToolView.SphereRadius *
 			  capsuleDirection;
 			// push tool back so that it's centered on transform/bone
 			Vector3 toolPosition = capsuleTipPosition + toolSphereRadiusOffsetFromTip;
@@ -161,6 +166,21 @@ namespace OculusSampleFramework
 			UpdateAverageVelocity();
 
 			CheckAndUpdateScale();
+
+			// OSY MODIFICATION HERE
+
+			if (_gaugeManager.GetHandForce() > PRESS_THRESHOLD[1])
+			{
+				transform.position += Vector3.Normalize(transform.right)*0.05f;
+				transform.localScale *= 0.5f;
+				_lastScale *= 0.5f;
+			} else if (_gaugeManager.GetHandForce() > PRESS_THRESHOLD[0])
+			{
+				transform.position += Vector3.Normalize(transform.right)*0.025f;
+				transform.localScale *= 0.8f;
+				_lastScale *= 0.8f;
+			}
+			
 		}
 
 		private void UpdateAverageVelocity()

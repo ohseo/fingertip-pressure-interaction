@@ -125,8 +125,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 971c1e3a4061e0f44a6180cbbf319285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fingerTipPokeToolView: {fileID: 6421004895363824932}
+  _fingerTipPressToolView: {fileID: 6421004895363824932}
   _fingerToFollow: 1
+  _gaugeManager: {fileID: 0}
 --- !u!1 &1571306303871116
 GameObject:
   m_ObjectHideFlags: 0

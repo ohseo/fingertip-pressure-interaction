@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 4926998750941526}
   _lineRenderer: {fileID: 120032820719270462}
+  _positionMarker: {fileID: 0}
 --- !u!120 &120032820719270462
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -198,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d9e849091264141aa2fcea9bc59f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rayToolView: {fileID: 6438454250529176374}
+  _rayPressToolView: {fileID: 6438454250529176374}
   _coneAngleDegrees: 20
   _farFieldMaxDistance: 7
   _gaugeManager: {fileID: 250182845823487022, guid: c77702986c742e744b30d447d50f954c,

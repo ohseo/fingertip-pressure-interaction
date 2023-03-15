@@ -31,7 +31,7 @@ namespace OculusSampleFramework
 
 		private const int RELATIVE_MODE = 4;
 
-		[SerializeField] private RayPressToolView _rayToolView = null;
+		[SerializeField] private RayPressToolView _rayPressToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
 		[SerializeField] private float _farFieldMaxDistance = 5f;
 		[SerializeField] private LinearGaugeManager _gaugeManager = null;
@@ -86,11 +86,11 @@ namespace OculusSampleFramework
 		{
 			get
 			{
-				return _rayToolView.EnableState;
+				return _rayPressToolView.EnableState;
 			}
 			set
 			{
-				_rayToolView.EnableState = value;
+				_rayPressToolView.EnableState = value;
 			}
 		}
 
@@ -105,9 +105,9 @@ namespace OculusSampleFramework
 
 		public override void Initialize()
 		{
-			Assert.IsNotNull(_rayToolView);
+			Assert.IsNotNull(_rayPressToolView);
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
-			_rayToolView.InteractableTool = this;
+			_rayPressToolView.InteractableTool = this;
 			_gaugeManager = GameObject.Find("LinearGaugeManager").GetComponent<LinearGaugeManager>();
 			_coneAngleReleaseDegrees = _coneAngleDegrees * 1.2f;
 			_initialized = true;
@@ -157,8 +157,8 @@ namespace OculusSampleFramework
 
 			_pinchStateModule.UpdateState(hand, _focusedInteractable, _gaugeManager);
 			// _pinchStateModule.UpdateState(hand, _focusedInteractable);
-			_rayToolView.RelativeActivateState = !_pinchStateModule.NotPinching;
-			_rayToolView.ToolActivateState = _pinchStateModule.PressSteadyOnFocusedObject ||
+			_rayPressToolView.RelativeActivateState = !_pinchStateModule.NotPinching;
+			_rayPressToolView.ToolActivateState = _pinchStateModule.PressSteadyOnFocusedObject ||
 				_pinchStateModule.PressDownOnFocusedObject;
 			// _rayToolView.ToolActivateState = true;
 
@@ -479,13 +479,13 @@ namespace OculusSampleFramework
 		public override void FocusOnInteractable(Interactable focusedInteractable,
 		  ColliderZone colliderZone)
 		{
-			_rayToolView.SetFocusedInteractable(focusedInteractable);
+			_rayPressToolView.SetFocusedInteractable(focusedInteractable);
 			_focusedInteractable = focusedInteractable;
 		}
 
 		public override void DeFocus()
 		{
-			_rayToolView.SetFocusedInteractable(null);
+			_rayPressToolView.SetFocusedInteractable(null);
 			_focusedInteractable = null;
 		}
 	}
