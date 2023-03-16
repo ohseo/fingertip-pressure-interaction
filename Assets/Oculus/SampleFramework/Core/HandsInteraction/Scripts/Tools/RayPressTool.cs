@@ -130,25 +130,25 @@ namespace OculusSampleFramework
 			}
 
 			var hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
-			var skeleton = IsRightHandedTool ? HandsManager.Instance.RightHandSkeleton : HandsManager.Instance.LeftHandSkeleton;
+			// var skeleton = IsRightHandedTool ? HandsManager.Instance.RightHandSkeleton : HandsManager.Instance.LeftHandSkeleton;
 			var pointer = hand.PointerPose;
-			var centerEye = GameObject.Find("CenterEyeAnchor").transform;
-			var shoulder = centerEye.position - new Vector3(0.1f, 0.25f, 0f);
-			var wrist = skeleton.Bones[(int)OVRPlugin.BoneId.Hand_WristRoot].Transform.position;
-			// var midpoint = (skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Thumb3].Transform.position + skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Index3].Transform.position)/2;
-			var midpoint = skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Index1].Transform.position
-				+ skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Index1].Transform.up.normalized * 0.05f;
-			var forearmpoint = wrist * 0.5f + shoulder * 0.5f;
-			var forward = Vector3.Normalize(midpoint - forearmpoint);
+			// var centerEye = GameObject.Find("CenterEyeAnchor").transform;
+			// var shoulder = centerEye.position - new Vector3(0.1f, 0.25f, 0f);
+			// var wrist = skeleton.Bones[(int)OVRPlugin.BoneId.Hand_WristRoot].Transform.position;
+			// // var midpoint = (skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Thumb3].Transform.position + skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Index3].Transform.position)/2;
+			// var midpoint = skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Index1].Transform.position
+			// 	+ skeleton.Bones[(int)OVRPlugin.BoneId.Hand_Index1].Transform.up.normalized * 0.05f;
+			// var forearmpoint = wrist * 0.5f + shoulder * 0.5f;
+			// var forward = Vector3.Normalize(midpoint - forearmpoint);
 
-			if(IsRightHandedTool)
-			{
+			// if(IsRightHandedTool)
+			// {
 				transform.position = pointer.position;
 				transform.rotation = pointer.rotation;
-			}else{
-				transform.position = midpoint;
-				transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
-			}
+			// }else{
+			// 	transform.position = midpoint;
+			// 	transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+			// }
 
 			var prevPosition = InteractionPosition;
 			var currPosition = transform.position;
