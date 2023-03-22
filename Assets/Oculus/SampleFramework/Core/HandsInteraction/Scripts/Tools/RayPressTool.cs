@@ -289,16 +289,16 @@ namespace OculusSampleFramework
 
 			// if we already have focused on something, keep it until the angle between
 			// our forward direction and object vector becomes too large
-			if (_currInteractableCastedAgainst != null &&
-				HasRayReleasedInteractable(_currInteractableCastedAgainst))
-			{
-				// reset state
-				_currInteractableCastedAgainst = null;
-			}
+			// if (_currInteractableCastedAgainst != null &&
+			// 	HasRayReleasedInteractable(_currInteractableCastedAgainst))
+			// {
+			// 	// reset state
+			// 	_currInteractableCastedAgainst = null;
+			// }
 
-			// Find target interactable if we haven't found one before.
-			if (_currInteractableCastedAgainst == null)
-			{
+			// // Find target interactable if we haven't found one before.
+			// if (_currInteractableCastedAgainst == null)
+			// {
 				_currentIntersectingObjects.Clear();
 				_currInteractableCastedAgainst = FindTargetInteractable();
 
@@ -336,7 +336,7 @@ namespace OculusSampleFramework
 						_currInteractableCastedAgainst = null;
 					}
 				}
-			}
+			// }
 
 			return _currentIntersectingObjects;
 		}
@@ -366,10 +366,10 @@ namespace OculusSampleFramework
 			targetInteractable = FindPrimaryRaycastHit(rayOrigin, rayDirection);
 
 			// if primary cast fails, try secondary cone test
-			if (targetInteractable == null)
-			{
-				targetInteractable = FindInteractableViaConeTest(rayOrigin, rayDirection);
-			}
+			// if (targetInteractable == null)
+			// {
+				// targetInteractable = FindInteractableViaConeTest(rayOrigin, rayDirection);
+			// }
 
 			return targetInteractable;
 		}
