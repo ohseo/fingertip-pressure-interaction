@@ -29,7 +29,7 @@ namespace OculusSampleFramework
 		private readonly float[] CD_GAIN = {0.5f, 0.25f};
 		private const float PRESS_LOWER_THRESHOLD = 0.07f;
 
-		private const int RELATIVE_MODE = 4;
+		private const int RELATIVE_MODE = 1;
 
 		[SerializeField] private RayPressToolView _rayPressToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
@@ -43,6 +43,9 @@ namespace OculusSampleFramework
 		private Vector3 pinchDownForward;
 		
 		private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
+		private Vector3 pinchDownTarget, prevResultTarget;
+
+		private GameObject _handMarker;
 
 		public override InteractableToolTags ToolTags
 		{
@@ -104,7 +107,11 @@ namespace OculusSampleFramework
 		private bool _initialized = false;
 
 		public override void Initialize()
-		{
+		{			
+			_handMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			_handMarker.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
+			_handMarker.SetActive(false);
+			Assert.IsNotNull(_handMarker);
 			Assert.IsNotNull(_rayPressToolView);
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
 			_rayPressToolView.InteractableTool = this;
@@ -163,77 +170,17 @@ namespace OculusSampleFramework
 			// _rayToolView.ToolActivateState = true;
 
 			// OSY RAY MODIFICATION HERE
-			// if(RELATIVE_MODE == 1)
-			// {
-			// 	if(_pinchStateModule.IsPinchDown)
-			// 	{
-			// 		pinchDownPosition = transform.position;
-			// 		pinchDownForward = transform.forward;
-			// 		hasPinchDownSaved = true;
-			// 	} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
-			// 	{
-			// 		if(hasPinchDownSaved)
-			// 		{
-			// 			var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
-			// 			newForward = Vector3.Normalize(newForward);
-			// 			transform.forward = newForward;
-			// 			transform.position = pinchDownPosition;
-			// 		}
-			// 	} else
-			// 	{
-			// 		hasPinchDownSaved = false;
-			// 	}
-			// } else if (RELATIVE_MODE == 2)
-			// {
-			// 	if(_pinchStateModule.IsPinchDown)
-			// 	{
-			// 		pinchDownPosition = transform.position;
-			// 		pinchDownForward = transform.forward;
-			// 		hasPinchDownSaved = true;
-			// 	} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
-			// 	{
-			// 		if(hasPinchDownSaved)
-			// 		{
-			// 			var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
-			// 			transform.position = newPosition;
-			// 			transform.forward = pinchDownForward;
-			// 		}
-			// 	} else
-			// 	{
-			// 		hasPinchDownSaved = false;
-			// 	}
-			// } else if (RELATIVE_MODE == 3)
-			// {
-			// 	if(_pinchStateModule.IsPinchDown)
-			// 	{
-			// 		pinchDownPosition = transform.position;
-			// 		pinchDownForward = transform.forward;
-			// 		hasPinchDownSaved = true;
-			// 	} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
-			// 	{
-			// 		if(hasPinchDownSaved)
-			// 		{
-			// 			var newPosition = transform.position * CD_GAIN + pinchDownPosition * (1-CD_GAIN);
-			// 			var newForward = transform.forward * CD_GAIN + pinchDownForward * (1-CD_GAIN);
-			// 			newForward = Vector3.Normalize(newForward);
-			// 			transform.position = newPosition;
-			// 			transform.forward = newForward;
-			// 		}
-			// 	} else
-			// 	{
-			// 		hasPinchDownSaved = false;
-			// 	}
-			// } else if (RELATIVE_MODE == 4)
-			// {
+			if (RELATIVE_MODE == 1) // position and forward both move
+			{
 				if(_pinchStateModule.IsPinchDown)
 				{
 					prevPointingPosition = transform.position;
 					prevPointingForward = transform.forward;
 					prevResultPosition = transform.position;
 					prevResultForward = transform.forward;
-					pinchDownPosition = transform.position;
-					pinchDownForward = transform.forward;
 					hasPinchDownSaved = true;
+					_handMarker.SetActive(true);
+					_handMarker.transform.position = transform.position;
 				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
 				{
 					if(hasPinchDownSaved)
@@ -254,12 +201,77 @@ namespace OculusSampleFramework
 						prevResultForward = newForward;
 						transform.position = newPosition;
 						transform.forward = newForward;
+						_handMarker.transform.position = transform.position;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+					_handMarker.SetActive(false);
+				}
+			} else if (RELATIVE_MODE == 2) // position stays, forward rotates
+			{
+				if(_pinchStateModule.IsPinchDown)
+				{
+					prevPointingForward = transform.forward;
+					prevResultForward = transform.forward;
+					pinchDownPosition = transform.position;
+					hasPinchDownSaved = true;
+					_handMarker.SetActive(true);
+					_handMarker.transform.position = transform.position;
+				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var cdgain = 0f;
+						if(_pinchStateModule.pressStrength < PRESS_LOWER_THRESHOLD)
+						{
+							cdgain = CD_GAIN[0];
+						} else {
+							cdgain = CD_GAIN[1];
+						}
+						var newForward = (transform.forward - prevPointingForward) * cdgain + prevResultForward;
+						newForward = Vector3.Normalize(newForward);
+						prevPointingForward = transform.forward;
+						prevResultForward = newForward;
+						transform.position = pinchDownPosition;
+						transform.forward = newForward;
+						_handMarker.transform.position = transform.position;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+					_handMarker.SetActive(false);
+				}
+			} else if (RELATIVE_MODE == 3) // position follows, forward rotates
+			{
+				if(_pinchStateModule.IsPinchDown)
+				{
+					prevPointingPosition = transform.position;
+					prevResultTarget = transform.position + transform.forward;
+					hasPinchDownSaved = true;
+				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var cdgain = 0f;
+						if(_pinchStateModule.pressStrength < PRESS_LOWER_THRESHOLD)
+						{
+							cdgain = CD_GAIN[0];
+						} else {
+							cdgain = CD_GAIN[1];
+						}
+						var deltaPosition = transform.position - prevPointingPosition;
+						var newTarget = prevResultTarget + deltaPosition * cdgain;
+						var newForward = Vector3.Normalize(newTarget - transform.position);
+						prevPointingPosition = transform.position;
+						prevResultTarget = newTarget;
+						transform.forward = newForward;
 					}
 				} else
 				{
 					hasPinchDownSaved = false;
 				}
-			// }
+			}
 
 			// if(!_pinchStateModule.NoPress)
 			// {

@@ -20,7 +20,7 @@ namespace OculusSampleFramework
 	public class RayPressToolView : MonoBehaviour, InteractableToolView
 	{
 		private const int NUM_RAY_LINE_POSITIONS = 25;
-		private const float DEFAULT_RAY_CAST_DISTANCE = 3.0f;
+		private const float DEFAULT_RAY_CAST_DISTANCE = 1.0f;
 
 		[SerializeField] private Transform _targetTransform = null;
 		[SerializeField] private LineRenderer _lineRenderer = null;
@@ -117,8 +117,9 @@ namespace OculusSampleFramework
 			var targetVector = targetPosition - myPosition;
 			var targetDistance = targetVector.magnitude;
 			// // OSY TEMP CODE
-			_positionMarker.transform.position = myPosition;
-			myPosition = myPosition - myForward * DEFAULT_RAY_CAST_DISTANCE;
+			_positionMarker.transform.position = targetPosition;
+			// _positionMarker.transform.position = myPosition;
+			// myPosition = myPosition - myForward * DEFAULT_RAY_CAST_DISTANCE;
 			// // OSY TEMP CODE END
 
 			var p0 = myPosition;
