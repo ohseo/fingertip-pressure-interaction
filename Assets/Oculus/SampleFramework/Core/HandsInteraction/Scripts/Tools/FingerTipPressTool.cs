@@ -76,6 +76,7 @@ namespace OculusSampleFramework
 		private float _lastScale = 1.0f;
 		private bool _isInitialized = false;
 		private OVRBoneCapsule _capsuleToTrack;
+		private OVRBoneCapsule _bc;
 
 		public override void Initialize()
 		{
@@ -122,20 +123,30 @@ namespace OculusSampleFramework
 
 			List<BoneCapsuleTriggerLogic> boneCapsuleTriggerLogic = new List<BoneCapsuleTriggerLogic>();
 			List<OVRBoneCapsule> boneCapsules = HandsManager.GetCapsulesPerBone(handSkeleton, boneToTestCollisions);
-			foreach (var ovrCapsuleInfo in boneCapsules)
-			{
-				var boneCapsuleTrigger = ovrCapsuleInfo.CapsuleRigidbody.gameObject.AddComponent<BoneCapsuleTriggerLogic>();
-				ovrCapsuleInfo.CapsuleCollider.isTrigger = true;
-				boneCapsuleTrigger.ToolTags = ToolTags;
-				boneCapsuleTriggerLogic.Add(boneCapsuleTrigger);
-			}
+			_bc = boneCapsules[0];
+
+			var boneCapsuleTrigger = _bc.CapsuleRigidbody.gameObject.AddComponent<BoneCapsuleTriggerLogic>();
+			_bc.CapsuleCollider.isTrigger = true;
+			boneCapsuleTrigger.ToolTags = ToolTags;
+			boneCapsuleTriggerLogic.Add(boneCapsuleTrigger);
+		
+		
+			// foreach (var ovrCapsuleInfo in boneCapsules)
+			// {
+			// 	var boneCapsuleTrigger = ovrCapsuleInfo.CapsuleRigidbody.gameObject.AddComponent<BoneCapsuleTriggerLogic>();
+			// 	ovrCapsuleInfo.CapsuleCollider.isTrigger = true;
+			// 	boneCapsuleTrigger.ToolTags = ToolTags;
+			// 	boneCapsuleTriggerLogic.Add(boneCapsuleTrigger);
+			// }
 
 			_boneCapsuleTriggerLogic = boneCapsuleTriggerLogic.ToArray();
 			// finger tip should have only one capsule
-			if (boneCapsules.Count > 0)
-			{
-				_capsuleToTrack = boneCapsules[0];
-			}
+			// if (boneCapsules.Count > 0)
+			// {
+			// 	_capsuleToTrack = boneCapsules[0];
+			// }
+
+			_capsuleToTrack = _bc;
 
 			_isInitialized = true;
 		}
@@ -149,19 +160,31 @@ namespace OculusSampleFramework
 
 			OVRHand hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
 			float currentScale = hand.HandScale;
-			// push tool into the tip based on how wide it is. so negate the direction
-			Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;
-			// NOTE: use time settings 0.0111111/0.02 to make collisions work correctly!
-			Vector3 capsuleDirection = capsuleTransform.right;
-			Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 5f
-			  * capsuleDirection;
-			Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPressToolView.SphereRadius *
-			  capsuleDirection;
-			// push tool back so that it's centered on transform/bone
-			Vector3 toolPosition = capsuleTipPosition + toolSphereRadiusOffsetFromTip;
-			transform.position = toolPosition;
-			transform.rotation = capsuleTransform.rotation;
-			InteractionPosition = capsuleTipPosition;
+
+			Vector3 bcDirection = _bc.CapsuleCollider.transform.right;
+			// Vector3 bcDirection = new Vector3(0f, 0f, 1f);
+			_bc.CapsuleRigidbody.position = _bc.CapsuleRigidbody.position + bcDirection * 0.0001f;
+			_bc.CapsuleCollider.transform.position = _bc.CapsuleCollider.transform.position + bcDirection * 0.0001f;
+			// _bc.CapsuleCollider.transform.position = Vector3.zero;
+			// _bc.CapsuleRigidbody.position = Vector3.zero;
+			transform.position = _bc.CapsuleCollider.transform.position;
+			transform.rotation = _bc.CapsuleCollider.transform.rotation;
+			InteractionPosition = transform.position;
+
+
+			// // push tool into the tip based on how wide it is. so negate the direction
+			// Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;
+			// // NOTE: use time settings 0.0111111/0.02 to make collisions work correctly!
+			// Vector3 capsuleDirection = capsuleTransform.right;
+			// Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 5f
+			//   * capsuleDirection;
+			// Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPressToolView.SphereRadius *
+			//   capsuleDirection;
+			// // push tool back so that it's centered on transform/bone
+			// Vector3 toolPosition = capsuleTipPosition + toolSphereRadiusOffsetFromTip;
+			// transform.position = toolPosition;
+			// transform.rotation = capsuleTransform.rotation;
+			// InteractionPosition = capsuleTipPosition;
 
 			UpdateAverageVelocity();
 
