@@ -1,20 +1,27 @@
-/************************************************************************************
-Copyright : Copyright (c) Facebook Technologies, LLC and its affiliates. All rights reserved.
-
-Your use of this SDK or tool is subject to the Oculus SDK License Agreement, available at
-https://developer.oculus.com/licenses/oculussdk/
-
-Unless required by applicable law or agreed to in writing, the Utilities SDK distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-ANY KIND, either express or implied. See the License for the specific language governing
-permissions and limitations under the License.
-************************************************************************************/
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * Licensed under the Oculus SDK License Agreement (the "License");
+ * you may not use the Oculus SDK except in compliance with the License,
+ * which is provided at the time of installation or download, or which
+ * otherwise accompanies this software in either electronic or hard copy form.
+ *
+ * You may obtain a copy of the License at
+ *
+ * https://developer.oculus.com/licenses/oculussdk/
+ *
+ * Unless required by applicable law or agreed to in writing, the Oculus SDK
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[DefaultExecutionOrder(-90)]
 public class OVRHand : MonoBehaviour,
 	OVRSkeleton.IOVRSkeletonDataProvider,
 	OVRSkeletonRenderer.IOVRSkeletonRendererDataProvider,
@@ -96,8 +103,6 @@ public class OVRHand : MonoBehaviour,
 			IsDominantHand = (_handState.Status & OVRPlugin.HandStatus.DominantHand) != 0;
 			PointerPose.localPosition = _handState.PointerPose.Position.FromFlippedZVector3f();
 			PointerPose.localRotation = _handState.PointerPose.Orientation.FromFlippedZQuatf();
-			// PointerPose.localPosition = _handState.RootPose.Position.FromFlippedZVector3f();
-			// PointerPose.localRotation = _handState.RootPose.Orientation.FromFlippedZQuatf() * Quaternion.Euler(0,-90,0);
 			HandScale = _handState.HandScale;
 			HandConfidence = (TrackingConfidence)_handState.HandConfidence;
 
@@ -178,7 +183,7 @@ public class OVRHand : MonoBehaviour,
 		return data;
 	}
 
-	OVRSkeletonRenderer.SkeletonRendererData OVRSkeletonRenderer.IOVRSkeletonRendererDataProvider.GetSkeletonRendererData()
+    OVRSkeletonRenderer.SkeletonRendererData OVRSkeletonRenderer.IOVRSkeletonRendererDataProvider.GetSkeletonRendererData()
 	{
 		var data = new OVRSkeletonRenderer.SkeletonRendererData();
 
@@ -192,6 +197,7 @@ public class OVRHand : MonoBehaviour,
 
 		return data;
 	}
+
 
 	OVRMesh.MeshType OVRMesh.IOVRMeshDataProvider.GetMeshType()
 	{

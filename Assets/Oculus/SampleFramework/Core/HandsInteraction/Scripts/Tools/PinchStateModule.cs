@@ -1,4 +1,4 @@
-// Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+// (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
 using UnityEngine;
 
@@ -34,8 +34,7 @@ namespace OculusSampleFramework
 		{
 			get
 			{
-				// return _currPinchState == PinchState.PinchUp && _firstFocusedInteractable != null;
-				return _currPinchState == PinchState.PinchUp;
+				return _currPinchState == PinchState.PinchUp && _firstFocusedInteractable != null;
 			}
 		}
 
@@ -43,8 +42,7 @@ namespace OculusSampleFramework
 		{
 			get
 			{
-				// return _currPinchState == PinchState.PinchStay && _firstFocusedInteractable != null;
-				return _currPinchState == PinchState.PinchStay;
+				return _currPinchState == PinchState.PinchStay && _firstFocusedInteractable != null;
 			}
 		}
 
@@ -52,8 +50,7 @@ namespace OculusSampleFramework
 		{
 			get
 			{
-				// return _currPinchState == PinchState.PinchDown && _firstFocusedInteractable != null;
-				return _currPinchState == PinchState.PinchDown;
+				return _currPinchState == PinchState.PinchDown && _firstFocusedInteractable != null;
 			}
 		}
 
