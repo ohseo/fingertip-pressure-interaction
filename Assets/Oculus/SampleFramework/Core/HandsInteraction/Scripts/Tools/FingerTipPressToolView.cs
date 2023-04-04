@@ -20,6 +20,7 @@ namespace OculusSampleFramework
 	public class FingerTipPressToolView : MonoBehaviour, InteractableToolView
 	{
 		[SerializeField] private MeshRenderer _sphereMeshRenderer = null;
+		[SerializeField] private LineRenderer _lineRenderer = null;
 
 		public InteractableTool InteractableTool { get; set; }
 
@@ -39,15 +40,30 @@ namespace OculusSampleFramework
 
 		public float SphereRadius { get; private set; }
 
+		private Vector3[] linePositions = new Vector3[2];
+
 		private void Awake()
 		{
 			Assert.IsNotNull(_sphereMeshRenderer);
+			Assert.IsNotNull(_lineRenderer);
 			SphereRadius = _sphereMeshRenderer.transform.localScale.z * 0.5f;
+			_lineRenderer.positionCount = 2;
 		}
 
 		public void SetFocusedInteractable(Interactable interactable)
 		{
 			// nothing to see here
+		}
+
+		private void Update()
+		{
+			// var myPosition = InteractableTool.ToolTransform.position + InteractableTool.ToolTransform.localScale.x * 0.005f * InteractableTool.ToolTransform.forward;
+			var myPosition = InteractableTool.InteractionPosition;
+			var myForward = InteractableTool.ToolTransform.right;
+
+			linePositions[0] = myPosition;
+			linePositions[1] = myPosition + myForward;
+			_lineRenderer.SetPositions(linePositions);
 		}
 	}
 }

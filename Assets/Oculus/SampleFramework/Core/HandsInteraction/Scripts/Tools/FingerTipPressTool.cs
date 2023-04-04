@@ -153,7 +153,7 @@ namespace OculusSampleFramework
 			Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;
 			// NOTE: use time settings 0.0111111/0.02 to make collisions work correctly!
 			Vector3 capsuleDirection = capsuleTransform.right;
-			Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 0.5f
+			Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 5f
 			  * capsuleDirection;
 			Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPressToolView.SphereRadius *
 			  capsuleDirection;
