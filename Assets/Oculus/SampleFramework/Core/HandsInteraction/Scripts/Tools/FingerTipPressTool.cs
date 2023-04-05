@@ -123,11 +123,16 @@ namespace OculusSampleFramework
 
 			List<BoneCapsuleTriggerLogic> boneCapsuleTriggerLogic = new List<BoneCapsuleTriggerLogic>();
 			List<OVRBoneCapsule> boneCapsules = HandsManager.GetCapsulesPerBone(handSkeleton, boneToTestCollisions);
-			_capsuleToTrack = boneCapsules[0];
+
+			// finger tip should have only one capsule
+			if (boneCapsules.Count > 0)
+			{
+				_capsuleToTrack = boneCapsules[0];
+			}
 
 			////// OSY: deep copy boneCapsule
 			_bc = new OVRBoneCapsule();
-			_bc.BoneIndex = boneCapsules[0].BoneIndex;
+			_bc.BoneIndex = _capsuleToTrack.BoneIndex;
 			
 			_bc.CapsuleRigidbody = new GameObject("modifiedCapsuleRigidbody").AddComponent<Rigidbody>();
 			_bc.CapsuleRigidbody.mass = 1.0f;
@@ -135,7 +140,7 @@ namespace OculusSampleFramework
 			_bc.CapsuleRigidbody.useGravity = false;
 			_bc.CapsuleRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
 
-			GameObject orbGO = boneCapsules[0].CapsuleRigidbody.gameObject;
+			GameObject orbGO = _capsuleToTrack.CapsuleRigidbody.gameObject;
 
 			GameObject _rbGO = _bc.CapsuleRigidbody.gameObject;
 			_rbGO.transform.SetParent(orbGO.transform.parent, false);
@@ -144,12 +149,12 @@ namespace OculusSampleFramework
 
 			_bc.CapsuleCollider = new GameObject("modifiedCapsuleCollider").AddComponent<CapsuleCollider>();
 
-			_bc.CapsuleCollider.radius = boneCapsules[0].CapsuleCollider.radius;
-			_bc.CapsuleCollider.height = boneCapsules[0].CapsuleCollider.height;
-			_bc.CapsuleCollider.direction = boneCapsules[0].CapsuleCollider.direction;
-			_bc.CapsuleCollider.center = boneCapsules[0].CapsuleCollider.center;
+			_bc.CapsuleCollider.radius = _capsuleToTrack.CapsuleCollider.radius;
+			_bc.CapsuleCollider.height = _capsuleToTrack.CapsuleCollider.height;
+			_bc.CapsuleCollider.direction = _capsuleToTrack.CapsuleCollider.direction;
+			_bc.CapsuleCollider.center = _capsuleToTrack.CapsuleCollider.center;
 
-			GameObject occGO = boneCapsules[0].CapsuleCollider.gameObject;
+			GameObject occGO = _capsuleToTrack.CapsuleCollider.gameObject;
 
 			GameObject _ccGO = _bc.CapsuleCollider.gameObject;
 			_ccGO.transform.SetParent(_rbGO.transform, false);
@@ -172,11 +177,6 @@ namespace OculusSampleFramework
 			// }
 
 			_boneCapsuleTriggerLogic = boneCapsuleTriggerLogic.ToArray();
-			// finger tip should have only one capsule
-			// if (boneCapsules.Count > 0)
-			// {
-			// 	_capsuleToTrack = boneCapsules[0];
-			// }
 
 			_isInitialized = true;
 		}
