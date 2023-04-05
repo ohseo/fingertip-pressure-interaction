@@ -191,30 +191,39 @@ namespace OculusSampleFramework
 			OVRHand hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
 			float currentScale = hand.HandScale;
 
+			float forceScale = 0.5f;
+			float forceOffset = 0.025f;
+
 			// push tool into the tip based on how wide it is. so negate the direction
 			Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;
 			// NOTE: use time settings 0.0111111/0.02 to make collisions work correctly!
 			Vector3 capsuleDirection = capsuleTransform.right;
 			Vector3 capsuleTipPosition = capsuleTransform.position + _capsuleToTrack.CapsuleCollider.height * 0.5f
 			  * capsuleDirection;
-			Vector3 toolSphereRadiusOffsetFromTip = currentScale * _fingerTipPressToolView.SphereRadius *
-			  capsuleDirection;
+
+			//// OSY
+			float scaledRadius = _fingerTipPressToolView.SphereRadius * forceScale;
+			Vector3 toolSphereRadiusOffsetFromTip = currentScale * scaledRadius * capsuleDirection;
 			// push tool back so that it's centered on transform/bone
 			Vector3 toolPosition = capsuleTipPosition + toolSphereRadiusOffsetFromTip;
-			// transform.position = toolPosition;
-			// transform.rotation = capsuleTransform.rotation;
-			// InteractionPosition = capsuleTipPosition;
 
-			float c = 0.01f;
-			Vector3 forceOffset = capsuleDirection * c;
+			Vector3 scale3D = new Vector3(forceScale, forceScale, forceScale);
+			Vector3 toolOffset = capsuleDirection * forceOffset;
 
-			_bc.CapsuleRigidbody.position = toolPosition + forceOffset;
-			_bc.CapsuleCollider.transform.position = toolPosition + forceOffset;
+			// scale colliding capsule and tool
+			_bc.CapsuleCollider.radius = scaledRadius;
+			_bc.CapsuleCollider.height = scaledRadius * 2f;
+			transform.localScale = scale3D;
+
+			// make capsule tip trigger input
+			_bc.CapsuleRigidbody.position = toolPosition + toolOffset; // + (scaledRadius - _bc.CapsuleCollider.height * 0.5f) * capsuleDirection;
+			_bc.CapsuleCollider.transform.position = _bc.CapsuleRigidbody.position;
 			_bc.CapsuleCollider.transform.rotation = capsuleTransform.rotation;
 
-			transform.position = _bc.CapsuleCollider.transform.position;
+			transform.position = toolPosition + toolOffset;
 			transform.rotation = _bc.CapsuleCollider.transform.rotation;
-			InteractionPosition = capsuleTipPosition + forceOffset;
+			InteractionPosition = toolPosition + toolOffset;
+			//// OSY end
 
 			UpdateAverageVelocity();
 

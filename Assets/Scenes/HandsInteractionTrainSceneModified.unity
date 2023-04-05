@@ -1669,6 +1669,21 @@ PrefabInstance:
       propertyPath: _cowController
       value: 
       objectReference: {fileID: 340861939}
+    - target: {fileID: 114984813253276884, guid: ba81d7ad914d196478713b77b78ab653,
+        type: 3}
+      propertyPath: _buttonContactColor.b
+      value: 0.26209736
+      objectReference: {fileID: 0}
+    - target: {fileID: 114984813253276884, guid: ba81d7ad914d196478713b77b78ab653,
+        type: 3}
+      propertyPath: _buttonContactColor.g
+      value: 0.8392157
+      objectReference: {fileID: 0}
+    - target: {fileID: 114984813253276884, guid: ba81d7ad914d196478713b77b78ab653,
+        type: 3}
+      propertyPath: _buttonContactColor.r
+      value: 0.20784314
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba81d7ad914d196478713b77b78ab653, type: 3}
 --- !u!1 &130028946
@@ -10306,9 +10321,21 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
         type: 3}
-      propertyPath: RightHandTools.Array.data[1]
+      propertyPath: LeftHandTools.Array.data[1]
+      value: 
+      objectReference: {fileID: 4212808563549492, guid: 50f797a2ff610ca4099b5cf42214abd5,
+        type: 3}
+    - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
+        type: 3}
+      propertyPath: RightHandTools.Array.data[0]
       value: 
       objectReference: {fileID: 4663491353866464, guid: e31899e95dd510444a25c62c9acbeb05,
+        type: 3}
+    - target: {fileID: 114894749535269414, guid: 2ced187cdc1b6b94da2fd30a37e8bc41,
+        type: 3}
+      propertyPath: RightHandTools.Array.data[1]
+      value: 
+      objectReference: {fileID: 4212808563549492, guid: 50f797a2ff610ca4099b5cf42214abd5,
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ced187cdc1b6b94da2fd30a37e8bc41, type: 3}
