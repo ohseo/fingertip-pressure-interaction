@@ -123,7 +123,39 @@ namespace OculusSampleFramework
 
 			List<BoneCapsuleTriggerLogic> boneCapsuleTriggerLogic = new List<BoneCapsuleTriggerLogic>();
 			List<OVRBoneCapsule> boneCapsules = HandsManager.GetCapsulesPerBone(handSkeleton, boneToTestCollisions);
-			_bc = boneCapsules[0];
+			_capsuleToTrack = boneCapsules[0];
+
+			////// OSY: deep copy boneCapsule
+			_bc = new OVRBoneCapsule();
+			_bc.BoneIndex = boneCapsules[0].BoneIndex;
+			
+			_bc.CapsuleRigidbody = new GameObject("modifiedCapsuleRigidbody").AddComponent<Rigidbody>();
+			_bc.CapsuleRigidbody.mass = 1.0f;
+            _bc.CapsuleRigidbody.isKinematic = true;
+			_bc.CapsuleRigidbody.useGravity = false;
+			_bc.CapsuleRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+
+			GameObject orbGO = boneCapsules[0].CapsuleRigidbody.gameObject;
+
+			GameObject _rbGO = _bc.CapsuleRigidbody.gameObject;
+			_rbGO.transform.SetParent(orbGO.transform.parent, false);
+			_rbGO.transform.position = orbGO.transform.position;
+			_rbGO.transform.rotation = orbGO.transform.rotation;
+
+			_bc.CapsuleCollider = new GameObject("modifiedCapsuleCollider").AddComponent<CapsuleCollider>();
+
+			_bc.CapsuleCollider.radius = boneCapsules[0].CapsuleCollider.radius;
+			_bc.CapsuleCollider.height = boneCapsules[0].CapsuleCollider.height;
+			_bc.CapsuleCollider.direction = boneCapsules[0].CapsuleCollider.direction;
+			_bc.CapsuleCollider.center = boneCapsules[0].CapsuleCollider.center;
+
+			GameObject occGO = boneCapsules[0].CapsuleCollider.gameObject;
+
+			GameObject _ccGO = _bc.CapsuleCollider.gameObject;
+			_ccGO.transform.SetParent(_rbGO.transform, false);
+			_ccGO.transform.localPosition = occGO.transform.localPosition;
+			_ccGO.transform.localRotation = occGO.transform.localRotation;
+			////// deep copy end
 
 			var boneCapsuleTrigger = _bc.CapsuleRigidbody.gameObject.AddComponent<BoneCapsuleTriggerLogic>();
 			_bc.CapsuleCollider.isTrigger = true;
@@ -146,8 +178,6 @@ namespace OculusSampleFramework
 			// 	_capsuleToTrack = boneCapsules[0];
 			// }
 
-			_capsuleToTrack = _bc;
-
 			_isInitialized = true;
 		}
 
@@ -161,12 +191,13 @@ namespace OculusSampleFramework
 			OVRHand hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
 			float currentScale = hand.HandScale;
 
-			Vector3 bcDirection = _bc.CapsuleCollider.transform.right;
-			// Vector3 bcDirection = new Vector3(0f, 0f, 1f);
-			_bc.CapsuleRigidbody.position = _bc.CapsuleRigidbody.position + bcDirection * 0.0001f;
-			_bc.CapsuleCollider.transform.position = _bc.CapsuleCollider.transform.position + bcDirection * 0.0001f;
-			// _bc.CapsuleCollider.transform.position = Vector3.zero;
-			// _bc.CapsuleRigidbody.position = Vector3.zero;
+			Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;
+			Vector3 capsuleDirection = capsuleTransform.right;
+
+			_bc.CapsuleRigidbody.position = _capsuleToTrack.CapsuleRigidbody.position + capsuleDirection * 0.1f;
+			_bc.CapsuleCollider.transform.position = capsuleTransform.position + capsuleDirection * 0.1f;
+			_bc.CapsuleCollider.transform.rotation = capsuleTransform.rotation;
+
 			transform.position = _bc.CapsuleCollider.transform.position;
 			transform.rotation = _bc.CapsuleCollider.transform.rotation;
 			InteractionPosition = transform.position;
