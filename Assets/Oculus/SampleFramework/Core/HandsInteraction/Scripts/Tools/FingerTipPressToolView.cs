@@ -62,7 +62,7 @@ namespace OculusSampleFramework
 			var myForward = InteractableTool.ToolTransform.right;
 
 			linePositions[0] = myPosition;
-			linePositions[1] = myPosition - myForward * 0.02f;
+			linePositions[1] = myPosition - myForward * 0.03f;
 			_lineRenderer.SetPositions(linePositions);
 		}
 	}

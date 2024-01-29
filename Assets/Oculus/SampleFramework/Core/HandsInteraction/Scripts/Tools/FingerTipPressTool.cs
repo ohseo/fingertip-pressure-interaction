@@ -31,6 +31,8 @@ namespace OculusSampleFramework
 		[SerializeField] private LinearGaugeManager _gaugeManager = null;
 
 		private readonly float[] PRESS_THRESHOLD = {0.08f, 0.16f};
+		private float forceScale = 0.25f;
+		private float forceOffset = 0.035f;
 
 		public override InteractableToolTags ToolTags
 		{
@@ -190,9 +192,6 @@ namespace OculusSampleFramework
 
 			OVRHand hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
 			float currentScale = hand.HandScale;
-
-			float forceScale = 0.5f;
-			float forceOffset = 0.025f;
 
 			// push tool into the tip based on how wide it is. so negate the direction
 			Transform capsuleTransform = _capsuleToTrack.CapsuleCollider.transform;

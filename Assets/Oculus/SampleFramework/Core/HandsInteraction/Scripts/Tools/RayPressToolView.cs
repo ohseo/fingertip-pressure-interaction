@@ -20,7 +20,7 @@ namespace OculusSampleFramework
 	public class RayPressToolView : MonoBehaviour, InteractableToolView
 	{
 		private const int NUM_RAY_LINE_POSITIONS = 25;
-		private const float DEFAULT_RAY_CAST_DISTANCE = 0.5f;
+		private const float DEFAULT_RAY_CAST_DISTANCE = 3.7f;
 
 		[SerializeField] private Transform _targetTransform = null;
 		[SerializeField] private LineRenderer _lineRenderer = null;

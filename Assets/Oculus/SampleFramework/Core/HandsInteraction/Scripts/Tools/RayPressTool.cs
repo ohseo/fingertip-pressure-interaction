@@ -29,7 +29,7 @@ namespace OculusSampleFramework
 		private readonly float[] CD_GAIN = {0.5f, 0.25f};
 		private const float PRESS_LOWER_THRESHOLD = 0.07f;
 
-		private const int RELATIVE_MODE = 1;
+		private const int RELATIVE_MODE = 4;
 
 		[SerializeField] private RayPressToolView _rayPressToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
@@ -254,6 +254,7 @@ namespace OculusSampleFramework
 					if(hasPinchDownSaved)
 					{
 						var cdgain = 0f;
+						// var cdgain = 0.2f;
 						if(_pinchStateModule.pressStrength < PRESS_LOWER_THRESHOLD)
 						{
 							cdgain = CD_GAIN[0];
@@ -270,6 +271,42 @@ namespace OculusSampleFramework
 				} else
 				{
 					hasPinchDownSaved = false;
+				}
+			} else if (RELATIVE_MODE == 4)
+			{
+				if(_pinchStateModule.IsPinchDown)
+				{
+					// prevPointingPosition = transform.position;
+					prevPointingForward = transform.forward;
+					// prevResultPosition = transform.position;
+					prevResultForward = transform.forward;
+					hasPinchDownSaved = true;
+				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var cdgain = 0.1f;
+						// if(_pinchStateModule.pressStrength < PRESS_LOWER_THRESHOLD)
+						// {
+						// 	cdgain = CD_GAIN[0];
+						// } else {
+						// 	cdgain = CD_GAIN[1];
+						// }
+						// var newPosition = (transform.position - prevPointingPosition) * cdgain + prevResultPosition;
+						var newForward = prevResultForward - (transform.forward - prevPointingForward) * cdgain ;
+						// newForward = Vector3.Normalize(newForward);
+						// prevPointingPosition = transform.position;
+						prevPointingForward = transform.forward;
+						// prevResultPosition = newPosition;
+						prevResultForward = newForward;
+						// transform.position = newPosition;
+						transform.forward = newForward;
+						_handMarker.transform.position = transform.position;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+					_handMarker.SetActive(false);
 				}
 			}
 
