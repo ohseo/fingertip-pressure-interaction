@@ -29,12 +29,13 @@ namespace OculusSampleFramework
 		private readonly float[] CD_GAIN = {0.5f, 0.25f};
 		private const float PRESS_LOWER_THRESHOLD = 0.07f;
 
-		private const int RELATIVE_MODE = 4;
+		private const int RELATIVE_MODE = 6;
 
 		[SerializeField] private RayPressToolView _rayPressToolView = null;
 		[Range(0.0f, 45.0f)] [SerializeField] private float _coneAngleDegrees = 20.0f;
-		[SerializeField] private float _farFieldMaxDistance = 5f;
-		[SerializeField] private LinearGaugeManager _gaugeManager = null;
+		[SerializeField] private float _farFieldMaxDistance = 4f;
+		// [SerializeField] private LinearGaugeManager _gaugeManager = null;
+		[SerializeField] private UDPManager _udpManager = null;
 
 		private TextMeshProUGUI _text;
 
@@ -56,6 +57,8 @@ namespace OculusSampleFramework
 		}
 
 		private PinchPressStateModule _pinchStateModule = new PinchPressStateModule();
+	
+		private KeyStateModule _keyStateModule = new KeyStateModule();
 		private Interactable _focusedInteractable;
 
 		//Only 4 states are defined in ToolInputState
@@ -115,7 +118,9 @@ namespace OculusSampleFramework
 			Assert.IsNotNull(_rayPressToolView);
 			InteractableToolsInputRouter.Instance.RegisterInteractableTool(this);
 			_rayPressToolView.InteractableTool = this;
-			_gaugeManager = GameObject.Find("LinearGaugeManager").GetComponent<LinearGaugeManager>();
+			// _gaugeManager = GameObject.Find("LinearGaugeManager").GetComponent<LinearGaugeManager>();
+			_udpManager = GameObject.Find("UDPManager").GetComponent<UDPManager>();
+			_udpManager.Init();
 			_coneAngleReleaseDegrees = _coneAngleDegrees * 1.2f;
 			_initialized = true;
 			_text = GameObject.Find("Canvas/pressState").GetComponent<TextMeshProUGUI>();
@@ -162,14 +167,17 @@ namespace OculusSampleFramework
 			Velocity = (currPosition - prevPosition) / Time.deltaTime;
 			InteractionPosition = currPosition;
 
-			_pinchStateModule.UpdateState(hand, _focusedInteractable, _gaugeManager);
-			// _pinchStateModule.UpdateState(hand, _focusedInteractable);
-			_rayPressToolView.RelativeActivateState = !_pinchStateModule.NotPinching;
-			_rayPressToolView.ToolActivateState = _pinchStateModule.PressSteadyOnFocusedObject ||
-				_pinchStateModule.PressDownOnFocusedObject;
-			// _rayToolView.ToolActivateState = true;
+			// _pinchStateModule.UpdateState(hand, _focusedInteractable, _gaugeManager);
+			// // _pinchStateModule.UpdateState(hand, _focusedInteractable);
+			// _rayPressToolView.RelativeActivateState = !_pinchStateModule.NotPinching;
+			// _rayPressToolView.ToolActivateState = _pinchStateModule.PressSteadyOnFocusedObject ||
+			// 	_pinchStateModule.PressDownOnFocusedObject;
+			// // _rayToolView.ToolActivateState = true;
 
-			// OSY RAY MODIFICATION HERE
+			_keyStateModule.UpdateState(hand, _focusedInteractable);
+			_rayPressToolView.ToolActivateState = _keyStateModule.IsDragging;
+
+			// ForceCtrl RAY MODIFICATION HERE
 			if (RELATIVE_MODE == 1) // position and forward both move
 			{
 				if(_pinchStateModule.IsPinchDown)
@@ -179,7 +187,7 @@ namespace OculusSampleFramework
 					prevResultPosition = transform.position;
 					prevResultForward = transform.forward;
 					hasPinchDownSaved = true;
-					_handMarker.SetActive(true);
+					// _handMarker.SetActive(true);
 					_handMarker.transform.position = transform.position;
 				} else if(!_pinchStateModule.NotPinching && !_pinchStateModule.IsPinchDown)
 				{
@@ -308,15 +316,73 @@ namespace OculusSampleFramework
 					hasPinchDownSaved = false;
 					_handMarker.SetActive(false);
 				}
-			}
+				_text.text = _pinchStateModule.currentPinchState;
+			} else if (RELATIVE_MODE == 5) // key control 
+			{
+				if(_keyStateModule.IsSoftDown || _keyStateModule.IsHardDownDragging)
+				{
+					prevPointingForward = transform.forward;
+					prevResultForward = transform.forward;
+					hasPinchDownSaved = true;
+				} else if (_keyStateModule.IsTouchDown)
+				{
+					hasPinchDownSaved = false;
 
-			// if(!_pinchStateModule.NoPress)
-			// {
-			// 	//test code
-			// 	transform.rotation = pointer.rotation * Quaternion.Euler(0,-90,0);
-			// }
+				} else if (!_keyStateModule.NotPinching && !_keyStateModule.IsSoftDown)
+				{
+					if(hasPinchDownSaved)
+					{
+						var cdgain = 0.07f;
+						var newForward = prevResultForward - (transform.forward - prevPointingForward) * cdgain ;
+						prevPointingForward = transform.forward;
+						prevResultForward = newForward;
+						transform.forward = newForward;
+					}
+				} else
+				{
+					hasPinchDownSaved = false;
+				}
+				_text.text = _keyStateModule.currentKeyState;
+			} else if (RELATIVE_MODE == 6) // key control, preserve new origin
+			{
+				if(_keyStateModule.IsSoftDown || _keyStateModule.IsHardDownDragging)
+				{
+					prevPointingForward = transform.forward;
+					prevResultForward = transform.forward;
+					hasPinchDownSaved = true;
+				// } else if (_keyStateModule.IsTouchDown)
+				// {
+				// 	// hasPinchDownSaved = false;
 
-			_text.text = _pinchStateModule.currentPinchState;
+				} else if (!_keyStateModule.NotPinching && _keyStateModule.IsTouching)
+				{
+					if(hasPinchDownSaved)
+					{
+						var deltaForward = prevResultForward - prevPointingForward;
+						var newForward = transform.forward + deltaForward;
+						prevPointingForward = transform.forward;
+						prevResultForward = newForward;
+						transform.forward = newForward;
+					}
+
+				} else if (!_keyStateModule.NotPinching && !_keyStateModule.IsSoftDown && !_keyStateModule.IsHardDownDragging)
+				{
+					if(hasPinchDownSaved)
+					{
+						var cdgain = 0.07f;
+						var newForward = prevResultForward - (transform.forward - prevPointingForward) * cdgain ;
+						prevPointingForward = transform.forward;
+						prevResultForward = newForward;
+						transform.forward = newForward;
+					}
+				} else if (_keyStateModule.NotPinching)
+				{
+					hasPinchDownSaved = false;
+				}
+				_text.text = _keyStateModule.currentKeyState;
+			} 
+
+
 
 		}
 

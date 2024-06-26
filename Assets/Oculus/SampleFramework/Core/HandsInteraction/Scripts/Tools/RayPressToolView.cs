@@ -70,11 +70,11 @@ namespace OculusSampleFramework
 
 		private void Awake()
 		{
-			_positionMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-			_positionMarker.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+			// _positionMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			// _positionMarker.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 			Assert.IsNotNull(_targetTransform);
 			Assert.IsNotNull(_lineRenderer);
-			Assert.IsNotNull(_positionMarker);
+			// Assert.IsNotNull(_positionMarker);
 			_lineRenderer.positionCount = NUM_RAY_LINE_POSITIONS;
 
 			_oldColorGradient = _lineRenderer.colorGradient;
@@ -86,7 +86,7 @@ namespace OculusSampleFramework
 			);
 			_highLightColorGradient = new Gradient();
 			_highLightColorGradient.SetKeys(
-			  new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.90f, 0.90f), 0.0f),
+			  new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.50f, 0.90f), 0.0f),
 		  new GradientColorKey(new Color(0.90f, 0.90f, 0.90f), 1.0f) },
 			  new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
 			);
@@ -117,9 +117,9 @@ namespace OculusSampleFramework
 			var targetVector = targetPosition - myPosition;
 			var targetDistance = targetVector.magnitude;
 			// // OSY TEMP CODE
-			_positionMarker.transform.position = targetPosition;
-			// _positionMarker.transform.position = myPosition;
-			// myPosition = myPosition - myForward * DEFAULT_RAY_CAST_DISTANCE;
+			// _positionMarker.transform.position = targetPosition;
+			//// _positionMarker.transform.position = myPosition;
+			//// myPosition = myPosition - myForward * DEFAULT_RAY_CAST_DISTANCE;
 			// // OSY TEMP CODE END
 
 			var p0 = myPosition;

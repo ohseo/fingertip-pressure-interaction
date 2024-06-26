@@ -20,6 +20,7 @@ public class UDPManager : MonoBehaviour
     void Start()
     {
         OnReceiveEvent.AddListener(ReceiveMessage);
+        Debug.Log("UDPManager: Starting...");
     }
 
     public void Init()
@@ -27,6 +28,7 @@ public class UDPManager : MonoBehaviour
         socket = new UdpClient(port);
         socket.BeginReceive(OnReceive, null);
         ipep = new IPEndPoint(IPAddress.Parse(ip), port);
+        Debug.Log("UDPManager: Listening on port " + port);
     }
 
     void OnReceive(IAsyncResult ar)
