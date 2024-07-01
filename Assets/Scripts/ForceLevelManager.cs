@@ -15,7 +15,7 @@ public class ForceLevelManager : MonoBehaviour
         udpManager.SetIPAddress(ip);
         udpManager.SetPort(port);
         udpManager.Init();
-        udpManager.OnReceiveEvent.AddListener(ReceiveForceLevel);
+        udpManager.UDPReceiveHandler.AddListener(ReceiveForceLevel);
     }
 
     // Update is called once per frame

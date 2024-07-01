@@ -13,13 +13,13 @@ public class UDPManager : MonoBehaviour
     string message = "";
 
     public class UDPEvent : UnityEvent<string> { }
-    public UDPEvent OnReceiveEvent = new UDPEvent();
+    public UDPEvent UDPReceiveHandler = new UDPEvent();
     public string ip;
     public int port;
 
     void Start()
     {
-        OnReceiveEvent.AddListener(ReceiveMessage);
+        UDPReceiveHandler.AddListener(MessageReceiver);
         Debug.Log("UDPManager: Starting...");
     }
 
@@ -43,19 +43,19 @@ public class UDPManager : MonoBehaviour
         socket.BeginReceive(OnReceive, null);
     }
 
-    void ReceiveMessage(string msg)
+    void MessageReceiver(string msg)
     {
         Debug.Log(msg);
     }
 
     void Update()
     {
-        OnReceiveEvent.Invoke(message);
+        UDPReceiveHandler.Invoke(message);
     }
 
     private void OnDestroy()
     {
-        OnReceiveEvent.RemoveAllListeners();
+        UDPReceiveHandler.RemoveAllListeners();
         socket.Close();
     }
 
