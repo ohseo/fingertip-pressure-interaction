@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ForceLevelManager : MonoBehaviour
 {
@@ -9,24 +10,22 @@ public class ForceLevelManager : MonoBehaviour
     [SerializeField]
     public string ip = "127.0.0.1";
     public int port = 5005;
+    public TextMeshProUGUI udpTextMesh;
+
+    public string forceLevel { get; set;}
 
     void Start()
     {
+        forceLevel = "";
         udpManager.SetIPAddress(ip);
         udpManager.SetPort(port);
+        udpManager.SetTextMesh(udpTextMesh);
         udpManager.Init();
-        udpManager.UDPReceiveHandler.AddListener(ReceiveForceLevel);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        forceLevel = udpManager.lastMessage;
     }
-
-    void ReceiveForceLevel(string message)
-    {
-        Debug.Log(message);
-    }
-
 }

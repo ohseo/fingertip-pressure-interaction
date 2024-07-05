@@ -5,30 +5,34 @@ using System.Text;
 using static System.Console;
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
 
 public class UDPManager : MonoBehaviour
 {
-    UdpClient socket;
-    IPEndPoint ipep;
-    string message = "";
+    private UdpClient socket;
+    private IPEndPoint ipep;
+    private string message = "";
+    public string lastMessage { get; set;}
 
     public class UDPEvent : UnityEvent<string> { }
     public UDPEvent UDPReceiveHandler = new UDPEvent();
-    public string ip;
-    public int port;
+    private string ip;
+    private int port;
+    private TextMeshProUGUI udpText;
 
     void Start()
     {
-        UDPReceiveHandler.AddListener(MessageReceiver);
-        Debug.Log("UDPManager: Starting...");
+        udpText.text = "UDPManager: Starting...";
     }
 
     public void Init()
     {
+        lastMessage = "";
         socket = new UdpClient(port);
         socket.BeginReceive(OnReceive, null);
         ipep = new IPEndPoint(IPAddress.Parse(ip), port);
         Debug.Log("UDPManager: Listening on port " + port);
+        UDPReceiveHandler.AddListener(MessageReceiver);
     }
 
     void OnReceive(IAsyncResult ar)
@@ -45,7 +49,9 @@ public class UDPManager : MonoBehaviour
 
     void MessageReceiver(string msg)
     {
-        Debug.Log(msg);
+        // Debug.Log(msg);
+        udpText.text = msg;
+        lastMessage = msg;
     }
 
     void Update()
@@ -67,5 +73,10 @@ public class UDPManager : MonoBehaviour
     public void SetPort(int port)
     {
         this.port = port;
+    }
+
+    public void SetTextMesh(TextMeshProUGUI udpText)
+    {
+        this.udpText = udpText;
     }
 }
