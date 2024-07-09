@@ -41,6 +41,25 @@ namespace OculusSampleFramework
             }
         }
 
+        public bool IsHolding
+        {
+            get
+            {
+                return _currForceState == ForceState.NoneDown
+                    || _currForceState == ForceState.NoneStay
+                    || _currForceState == ForceState.HardDown
+                    || _currForceState == ForceState.HardStay;
+            }
+        }
+
+        public bool IsPinching
+        {
+            get
+            {
+                return _currForceState != ForceState.PinchOpen;
+            }
+        }
+
         public bool IsDragging
         {
             get
