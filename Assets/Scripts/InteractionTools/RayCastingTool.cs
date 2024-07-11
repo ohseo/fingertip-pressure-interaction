@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace OculusSampleFramework
     public class RayCastingTool : MonoBehaviour
     {
         [SerializeField] private RayVisualizer _rayVisualizer = null;
-        [SerializeField] private float _rayMaxDistance = 4.0f;
+        [SerializeField] private float _rayMaxDistance = 4.2f;
 
         [SerializeField] private ForceLevelManager _forceLevelManager = null;
 
@@ -36,9 +37,9 @@ namespace OculusSampleFramework
         private const float POINTER_COLLIDER_RADIUS = 0.01f;
         private TargetSphere _currTargetHit = null;
         private Collider[] _collidersOverlapped = new Collider[NUM_COLLIDERS_TO_TEST];
-        private List<TargetSphere> _currIntersectingSpheres = new List<TargetSphere>();
+        private List<TargetSphere> _prevTargetsHit = new List<TargetSphere>();
         private RaycastHit[] _raycastHits = new RaycastHit[NUM_MAX_HITS];
-        private TargetSphere _currTarget = null;
+        private TargetSphere _currGrabbedTarget = null;
 
         //from Grabbers
 
@@ -107,13 +108,19 @@ namespace OculusSampleFramework
             _prevIsPreciseMode = _currIsPreciseMode;
             _currIsPreciseMode = _forceStateModule.IsInPreciseMode;
             UpdateCastedRay(_prevIsPreciseMode, _currIsPreciseMode);
+            if(_grabbedObj == null)
+            {
+                FindTargetSphere();
+            }
+
+            _prevIsHolding = _currIsHolding;
+            _currIsHolding = _forceStateModule.IsHolding;
+            CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
         }
 
         void OnUpdatedAnchors()
         {
-            _prevIsHolding = _currIsHolding;
-            _currIsHolding = _forceStateModule.IsHolding;
-            CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
+
         }
 
         public void UpdateCastedRay(bool prevIsPreciseMode, bool currIsPreciseMode)
@@ -160,6 +167,11 @@ namespace OculusSampleFramework
 
                 TargetSphere currTarget = hit.collider.gameObject.GetComponent<TargetSphere>();
 
+                if (currTarget == null)
+                {
+                    continue;
+                }
+
                 var distanceToTarget = (currTarget.transform.position - rayOrigin).magnitude;
                 
                 if (targetHit == null || distanceToTarget < minHitDistance)
@@ -169,7 +181,36 @@ namespace OculusSampleFramework
                 }
             }
 
-            _raycastHitDistance = minHitDistance;
+            if(targetHit != null)
+            {
+                foreach(TargetSphere sphere in _prevTargetsHit)
+                {
+                    if(sphere != targetHit)
+                    {
+                        sphere.Mute();
+                    }
+                }
+                if(!_prevTargetsHit.Contains(targetHit))
+                {
+                    _prevTargetsHit.Add(targetHit);
+                }
+                if (!targetHit.IsGrabbed)
+                {
+                    targetHit.Highlight();
+                }
+                _raycastHitDistance = minHitDistance;
+            } else
+            {
+                foreach(TargetSphere sphere in _prevTargetsHit)
+                {
+                    if (!sphere.IsGrabbed)
+                    {
+                        sphere.Mute();  
+                    }
+                }
+            }
+            
+
             return targetHit;
         }
 

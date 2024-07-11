@@ -158,7 +158,9 @@ namespace OculusSampleFramework
                         if(forceLevel == "2.0")
                         {
                             _currForceState = ForceState.HardDown;
-
+                        // } else if (forceLevel == "1.0")
+                        // {
+                        //     _currForceState = ForceState.SoftDown;
                         } else
                         {
                             _currForceState = ForceState.NoneStay;
