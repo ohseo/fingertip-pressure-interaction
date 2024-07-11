@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace OculusSampleFramework
@@ -16,9 +17,16 @@ namespace OculusSampleFramework
         public Vector3 InteractionPosition {get; protected set;}
         public OVRHand _hand;
         private ForceStateModule _forceStateModule = new ForceStateModule();
-
+        public TextMeshProUGUI _text;
+        private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
+        private Vector3 preciseRefPosition, preciseRefForward;
         private bool _currIsHolding = false;
         private bool _prevIsHolding = false;
+        private bool _currIsPreciseMode = false;
+        private bool _prevIsPreciseMode = false;
+        private const float CD_GAIN = 0.07f;
+        private Vector3 _targetOffsetOnRay;
+        private float _raycastHitDistance;
 
         //from Interactable Tools
 
@@ -56,6 +64,8 @@ namespace OculusSampleFramework
             {
                 rig.UpdatedAnchors += (r) => {OnUpdatedAnchors();};
             }
+
+            _forceLevelManager.udpManager.UDPReceiveHandler.AddListener(OnUDPReceive);
         }
 
         // Start is called before the first frame update
@@ -69,11 +79,19 @@ namespace OculusSampleFramework
             }
             IsRightHandedTool = true;   // TODO: Connect to tool creator later
             _rayVisualizer._rayCastingTool = this;
+            _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
         }
 
         // Update is called once per frame
         void Update()
         {
+            if (!HandsManager.Instance || !HandsManager.Instance.IsInitialized())
+            {
+                return;
+            }
+
+            var hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
+
             var pointer = _hand.PointerPose;
 
             transform.position = pointer.position;
@@ -81,60 +99,49 @@ namespace OculusSampleFramework
 
             var prevPosition = InteractionPosition;
 			var currPosition = transform.position;
-			// Velocity = (currPosition - prevPosition) / Time.deltaTime;
 			InteractionPosition = currPosition;
 
-            // TargetSphere target;
-            // target = FindTargetSphere();
+            _forceStateModule.UpdateState(hand, _forceLevelManager.forceLevel);
+            _text.text = _forceStateModule.currentForceState.ToString();
+
+            _prevIsPreciseMode = _currIsPreciseMode;
+            _currIsPreciseMode = _forceStateModule.IsInPreciseMode;
+            UpdateCastedRay(_prevIsPreciseMode, _currIsPreciseMode);
         }
 
         void OnUpdatedAnchors()
         {
-            Vector3 destPos = _parentTransform.TransformPoint(_anchorOffsetPosition);
-            Quaternion destRot = _parentTransform.rotation * _anchorOffsetRotation;
-
-            MoveGrabbedObject(destPos, destRot);
-
-            // _prevIsHolding = _currIsHolding;
-            // _currIsHolding = _forceStateModule.IsHolding;
-            // CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
-            CheckForGrabOrRelease(true, true);
-
+            _prevIsHolding = _currIsHolding;
+            _currIsHolding = _forceStateModule.IsHolding;
+            CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
         }
 
-        public List<TargetSphere> GetNextIntersectingTargets()
+        public void UpdateCastedRay(bool prevIsPreciseMode, bool currIsPreciseMode)
         {
-            //TODO: check if we already have a focused target
-
-            if(_currTargetHit == null)
+            if (prevPointingForward == null)
             {
-                _currIntersectingSpheres.Clear();
-                _currTargetHit = FindTargetSphere();
-
-                if (_currTargetHit != null)
+                if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
                 {
-                    var targetHitPoint = _currTargetHit.transform.position;
-                    int numHits = Physics.OverlapSphereNonAlloc(targetHitPoint, POINTER_COLLIDER_RADIUS, _collidersOverlapped);
-
-                    for (int i = 0; i < numHits; i++)
-                    {
-                        Collider colliderHit = _collidersOverlapped[i];
-                        TargetSphere hitTargetSphere = colliderHit.gameObject.GetComponent<TargetSphere>();
-                        if (hitTargetSphere == null || hitTargetSphere != _currTargetHit)
-                        {
-                            continue;
-                        }
-                        _currIntersectingSpheres.Add(hitTargetSphere);
-                    }
-
-                    if (_currIntersectingSpheres.Count == 0)
-                    {
-                        _currTargetHit = null;
-                    }
+                    prevPointingForward = transform.forward;
+                    prevResultForward = transform.forward;
+                } 
+            } else
+            {
+                if(_forceStateModule.IsPinching && currIsPreciseMode)
+                {
+                    var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
+                    prevPointingForward = transform.forward;
+                    prevResultForward = newForward;
+                    transform.forward = newForward;
+                } else
+                {
+                    var deltaForward = prevResultForward - prevPointingForward;
+                    var newForward = transform.forward + deltaForward;
+                    prevPointingForward = transform.forward;
+                    prevResultForward = newForward;
+                    transform.forward = newForward;
                 }
             }
-
-            return _currIntersectingSpheres;
         }
 
         private TargetSphere FindTargetSphere()
@@ -162,6 +169,7 @@ namespace OculusSampleFramework
                 }
             }
 
+            _raycastHitDistance = minHitDistance;
             return targetHit;
         }
 
@@ -170,27 +178,8 @@ namespace OculusSampleFramework
             return transform.position + MIN_RAYCAST_DISTANCE * transform.forward;
         }
 
-        protected void MoveGrabbedObject(Vector3 pos, Quaternion rot)
-        {
-            if(_grabbedObj == null)
-            {
-                return;
-            }
-
-            _grabbedObj.transform.position = pos + rot * _grabbedObjPosOff;
-            _grabbedObj.transform.rotation = rot * _grabbedObjRotOff;
-        }
-
         protected void CheckForGrabOrRelease(bool prevIsHolding, bool currIsHolding)
         {
-            // var obj = FindTargetSphere();
-            // if(obj != null && _prevGrabbedObj == null)
-            // {
-            //     GrabBegin();
-            // } else if (obj == null && _prevGrabbedObj != null)
-            // {
-            //     GrabEnd();
-            // }
             if (!prevIsHolding && currIsHolding)
             {
                 GrabBegin();
@@ -207,18 +196,8 @@ namespace OculusSampleFramework
             if(_grabbedObj != null)
             {
                 _grabbedObj.GrabBegin();
-
-                _lastPos = transform.position;
-                _lastRot = transform.rotation;
-                
-                Vector3 relPos = _grabbedObj.transform.position - transform.position;
-                relPos = Quaternion.Inverse(transform.rotation) * relPos;
-                _grabbedObjPosOff = relPos;
-
-                Quaternion relRot = Quaternion.Inverse(transform.rotation) * _grabbedObj.transform.rotation;
-                _grabbedObjRotOff = relRot;
-                
-                MoveGrabbedObject(_lastPos, _lastRot);
+                _grabbedObj.transform.parent = transform;
+                _grabbedObjPosOff = _grabbedObj.transform.localPosition;
             }
             _prevGrabbedObj = _grabbedObj;
         }
@@ -228,9 +207,15 @@ namespace OculusSampleFramework
             if(_grabbedObj != null)
             {
                 _grabbedObj.GrabEnd();
+                _grabbedObj.transform.parent = null;
                 _grabbedObj = null;
             }
             _prevGrabbedObj = _grabbedObj;
+        }
+
+        void OnUDPReceive(string msg)
+        {
+            _forceStateModule.IsWaiting = false;
         }
     }
 }

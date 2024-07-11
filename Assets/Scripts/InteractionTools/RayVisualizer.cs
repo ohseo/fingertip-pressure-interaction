@@ -24,11 +24,11 @@ namespace OculusSampleFramework
         // Update is called once per frame
         void Update()
         {
-            var myPosition = _rayCastingTool.RayTransform.position;
-			var myForward = _rayCastingTool.RayTransform.forward;
-            var ray = new Ray(myPosition, myForward);
-            _lineRenderer.SetPosition(0, ray.origin);
-            _lineRenderer.SetPosition(1, ray.origin + ray.direction * _rayLength);
+            // var myPosition = _rayCastingTool.RayTransform.position;
+			// var myForward = _rayCastingTool.RayTransform.forward;
+            // var ray = new Ray(myPosition, myForward);
+            // _lineRenderer.SetPosition(0, ray.origin);
+            // _lineRenderer.SetPosition(1, ray.origin + ray.direction * _rayLength);
         }
     }
 }

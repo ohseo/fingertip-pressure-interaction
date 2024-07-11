@@ -25,19 +25,13 @@ namespace OculusSampleFramework
         private ForceState _currForceState;
         private ForceState _prevForceState;
 
+        public bool IsWaiting { get; set; }
+
         public string currentForceState
         {
             get
             {
                 return _currForceState.ToString();
-            }
-        }
-
-        public bool IsNotPinching
-        {
-            get
-            {
-                return _currForceState == ForceState.PinchOpen;
             }
         }
 
@@ -47,6 +41,17 @@ namespace OculusSampleFramework
             {
                 return _currForceState == ForceState.NoneDown
                     || _currForceState == ForceState.NoneStay
+                    || _currForceState == ForceState.HardDown
+                    || _currForceState == ForceState.HardStay;
+            }
+        }
+
+        public bool IsInPreciseMode
+        {
+            get
+            {
+                return _currForceState == ForceState.SoftDown
+                    || _currForceState == ForceState.SoftStay
                     || _currForceState == ForceState.HardDown
                     || _currForceState == ForceState.HardStay;
             }
@@ -75,6 +80,7 @@ namespace OculusSampleFramework
         {
             _currForceState = ForceState.PinchOpen;
             _prevForceState = ForceState.PinchOpen;
+            IsWaiting = true;
         }
 
         public void UpdateState(OVRHand hand, string forceLevel) // Interactable
@@ -100,6 +106,7 @@ namespace OculusSampleFramework
                     if (isPinching)
                     {
                         _currForceState = ForceState.PinchStay;
+                        IsWaiting = true;
                     }
                     else
                     {
@@ -109,12 +116,15 @@ namespace OculusSampleFramework
                 case ForceState.PinchStay:  //Pinch Stay
                     if (isPinching)
                     {
-                        if (forceLevel == "1.0")
+                        if (!IsWaiting)
                         {
-                            _currForceState = ForceState.SoftDown;
-                        } else if (forceLevel == "0.0")
-                        {
-                            _currForceState = ForceState.NoneDown;
+                            if (forceLevel == "1.0")
+                            {
+                                _currForceState = ForceState.SoftDown;
+                            } else if (forceLevel == "0.0")
+                            {
+                                _currForceState = ForceState.NoneDown;
+                            }
                         }
                     }
                     else
