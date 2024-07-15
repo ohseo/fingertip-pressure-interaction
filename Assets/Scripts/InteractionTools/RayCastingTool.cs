@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace OculusSampleFramework
@@ -9,71 +11,48 @@ namespace OculusSampleFramework
     public class RayCastingTool : MonoBehaviour
     {
         [SerializeField] private RayVisualizer _rayVisualizer = null;
-        [SerializeField] private float _rayMaxDistance = 4.2f;
-
+        [SerializeField] private float _rayMaxDistance = 4.2f; // 6.13f;
         [SerializeField] private ForceLevelManager _forceLevelManager = null;
+        [SerializeField] private Transform _parentTransform;
+
+        private const float CD_GAIN = 0.167f;
+        private const int NUM_MAX_HITS = 10;
+        private const float MIN_RAYCAST_DISTANCE = 0.3f;
 
         public Transform RayTransform { get { return this.transform;} }
         public bool IsRightHandedTool { get; set; }
-        public Vector3 InteractionPosition {get; protected set;}
+        public int _raycastingMode = 2;
         public OVRHand _hand;
         private ForceStateModule _forceStateModule = new ForceStateModule();
         public TextMeshProUGUI _text;
         private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
-        private Vector3 preciseRefPosition, preciseRefForward;
         private bool _currIsHolding = false;
         private bool _prevIsHolding = false;
         private bool _currIsPreciseMode = false;
         private bool _prevIsPreciseMode = false;
-        private const float CD_GAIN = 0.07f;
-        private Vector3 _targetOffsetOnRay;
-        private float _raycastHitDistance;
+        private bool _refPointSaved = false;
 
-        //from Interactable Tools
-
-        private const int NUM_COLLIDERS_TO_TEST = 3;
-        private const int NUM_MAX_HITS = 10;
-        private const float MIN_RAYCAST_DISTANCE = 0.3f;
-        private const float POINTER_COLLIDER_RADIUS = 0.01f;
-        private TargetSphere _currTargetHit = null;
-        private Collider[] _collidersOverlapped = new Collider[NUM_COLLIDERS_TO_TEST];
         private List<TargetSphere> _prevTargetsHit = new List<TargetSphere>();
         private RaycastHit[] _raycastHits = new RaycastHit[NUM_MAX_HITS];
-        private TargetSphere _currGrabbedTarget = null;
-
-        //from Grabbers
-
-        protected Vector3 _anchorOffsetPosition;
-        protected Quaternion _anchorOffsetRotation;
         protected TargetSphere _grabbedObj = null;
         protected TargetSphere _prevGrabbedObj = null;
         protected Vector3 _grabbedObjPosOff;
-        protected Quaternion _grabbedObjRotOff;
-        protected Vector3 _lastPos;
-        protected Quaternion _lastRot;
 
-        [SerializeField]
-        protected Transform _parentTransform;
+
 
         void Awake()
         {
-            _anchorOffsetPosition = transform.localPosition;
-            _anchorOffsetRotation = transform.localRotation;
-
-            OVRCameraRig rig = transform.GetComponentInParent<OVRCameraRig>();
-            if (rig != null)
-            {
-                rig.UpdatedAnchors += (r) => {OnUpdatedAnchors();};
-            }
-
+            // OVRCameraRig rig = transform.GetComponentInParent<OVRCameraRig>();
+            // if (rig != null)
+            // {
+            //     rig.UpdatedAnchors += (r) => {OnUpdatedAnchors();};
+            // }
             _forceLevelManager.udpManager.UDPReceiveHandler.AddListener(OnUDPReceive);
         }
 
         // Start is called before the first frame update
         void Start()
         {
-            _lastPos = transform.position;
-            _lastRot = transform.rotation;
             if(_parentTransform == null)
             {
                 _parentTransform = gameObject.transform;
@@ -98,39 +77,77 @@ namespace OculusSampleFramework
             transform.position = pointer.position;
             transform.rotation = pointer.rotation;
 
-            var prevPosition = InteractionPosition;
-			var currPosition = transform.position;
-			InteractionPosition = currPosition;
-
             _forceStateModule.UpdateState(hand, _forceLevelManager.forceLevel);
             _text.text = _forceStateModule.currentForceState.ToString();
 
             _prevIsPreciseMode = _currIsPreciseMode;
-            _currIsPreciseMode = _forceStateModule.IsInPreciseMode;
-            UpdateCastedRay(_prevIsPreciseMode, _currIsPreciseMode);
+            _currIsPreciseMode = _forceStateModule.IsInPreciseMode;            
+            UpdateCastedRay(_raycastingMode, _prevIsPreciseMode, _currIsPreciseMode);
+            Debug.Log("Mode input is:"+_raycastingMode.ToString());
             if(_grabbedObj == null)
             {
                 FindTargetSphere();
             }
-
-            _prevIsHolding = _currIsHolding;
-            _currIsHolding = _forceStateModule.IsHolding;
-            CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
+            
+            if(!ForceRelease(_prevIsPreciseMode, _currIsPreciseMode))
+            {
+                _prevIsHolding = _currIsHolding;
+                _currIsHolding = _forceStateModule.IsHolding;
+                CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
+            }
         }
 
-        void OnUpdatedAnchors()
+        public void UpdateCastedRay(int mode, bool prevIsPreciseMode, bool currIsPreciseMode)
         {
+            Debug.Log("Mode is: "+mode.ToString());
+            switch(mode)
+            {
+                // case 1:
+                //     break;
+                case 2:
+                    CDGainRay(prevIsPreciseMode, currIsPreciseMode);
+                    break;
+                // case 3:
+                //     ForceCtrlRay(prevIsPreciseMode, currIsPreciseMode);
+                //     break;
+            }
+        }
+
+        private void CDGainRay(bool prevIsPreciseMode, bool currIsPreciseMode)
+        {
+
+            if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
+            {
+                prevPointingPosition = transform.position;
+                prevPointingForward = transform.forward;
+                prevResultPosition = transform.position;
+                prevResultForward = transform.forward;
+                // _refPointSaved = true;
+            }
+            else if(_forceStateModule.IsPinching && currIsPreciseMode)
+            {
+                var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
+                var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+                prevPointingPosition = transform.position;
+                prevPointingForward = transform.forward;
+                prevResultPosition = newPosition;
+                prevResultForward = newForward;
+                transform.position = newPosition;
+                transform.forward = newForward;
+            }
 
         }
 
-        public void UpdateCastedRay(bool prevIsPreciseMode, bool currIsPreciseMode)
+        private void ForceCtrlRay(bool prevIsPreciseMode, bool currIsPreciseMode)
         {
-            if (prevPointingForward == null)
+            // if (prevPointingForward == null)
+            if (!_refPointSaved)
             {
                 if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
                 {
                     prevPointingForward = transform.forward;
                     prevResultForward = transform.forward;
+                    _refPointSaved = true;
                 } 
             } else
             {
@@ -140,15 +157,27 @@ namespace OculusSampleFramework
                     prevPointingForward = transform.forward;
                     prevResultForward = newForward;
                     transform.forward = newForward;
-                } else
+                // } else if(!_forceStateModule.IsPinching)
+                // {
+                //     _refPointSaved = false;
+                    // var deltaForward = prevResultForward - prevPointingForward;
+                    // var newForward = transform.forward + deltaForward;
+                    // prevPointingForward = transform.forward;
+                    // prevResultForward = newForward;
+                    // transform.forward = newForward;
+                } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevent "jump"
                 {
-                    var deltaForward = prevResultForward - prevPointingForward;
-                    var newForward = transform.forward + deltaForward;
+                    var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
                     prevPointingForward = transform.forward;
                     prevResultForward = newForward;
                     transform.forward = newForward;
+                } else if (!_forceStateModule.IsPinching)
+                {
+                    _refPointSaved = false;
                 }
             }
+
+            // _grabbedObj.transform.localPosition = _grabbedObjPosOff;
         }
 
         private TargetSphere FindTargetSphere()
@@ -198,7 +227,6 @@ namespace OculusSampleFramework
                 {
                     targetHit.Highlight();
                 }
-                _raycastHitDistance = minHitDistance;
             } else
             {
                 foreach(TargetSphere sphere in _prevTargetsHit)
@@ -231,6 +259,16 @@ namespace OculusSampleFramework
 
         }
 
+        protected bool ForceRelease(bool prevIsPreciseMode, bool currIsPreciseMode)
+        {
+            if(prevIsPreciseMode && !currIsPreciseMode)
+            {
+                GrabEnd();
+                return true;
+            }
+            return false;
+        }
+
         protected void GrabBegin()
         {
             _grabbedObj = FindTargetSphere();
@@ -239,6 +277,7 @@ namespace OculusSampleFramework
                 _grabbedObj.GrabBegin();
                 _grabbedObj.transform.parent = transform;
                 _grabbedObjPosOff = _grabbedObj.transform.localPosition;
+                Debug.Log("Position Offset: "+_grabbedObjPosOff.ToString());
             }
             _prevGrabbedObj = _grabbedObj;
         }

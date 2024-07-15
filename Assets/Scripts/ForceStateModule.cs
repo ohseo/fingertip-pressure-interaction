@@ -121,6 +121,9 @@ namespace OculusSampleFramework
                             if (forceLevel == "1.0")
                             {
                                 _currForceState = ForceState.SoftDown;
+                            } else if (forceLevel == "2.0")     // Advantage entering into 3-Moderate state
+                            {
+                                _currForceState = ForceState.SoftDown;
                             } else if (forceLevel == "0.0")
                             {
                                 _currForceState = ForceState.NoneDown;
