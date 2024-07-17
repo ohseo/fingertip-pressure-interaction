@@ -12,7 +12,7 @@ public class UDPManager : MonoBehaviour
     private UdpClient socket;
     private IPEndPoint ipep;
     private string message = "";
-    public string lastMessage { get; set;}
+    public string lastMessage { get; set; }
 
     public class UDPEvent : UnityEvent<string> { }
     public UDPEvent UDPReceiveHandler = new UDPEvent();
@@ -22,7 +22,7 @@ public class UDPManager : MonoBehaviour
 
     void Start()
     {
-        udpText.text = "UDPManager: Starting...";
+        // udpText.text = "UDPManager: Starting...";
     }
 
     public void Init()
@@ -50,7 +50,8 @@ public class UDPManager : MonoBehaviour
     void MessageReceiver(string msg)
     {
         // Debug.Log(msg);
-        udpText.text = msg;
+        // udpText.text = msg.Split('\t')[0];
+        // udpText.text = msg;
         lastMessage = msg;
     }
 

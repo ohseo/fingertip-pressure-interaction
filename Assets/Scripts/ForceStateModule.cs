@@ -85,6 +85,7 @@ namespace OculusSampleFramework
 
         public void UpdateState(OVRHand hand, string forceLevel) // Interactable
         {
+            // if(forceLevel == "uncertain") Debug.Log("uncertain");
             float pinchStrength = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
             bool isPinching = Mathf.Abs(PINCH_STRENGTH_THRESHOLD - pinchStrength) < Mathf.Epsilon;
             _prevForceState = _currForceState;
@@ -118,13 +119,13 @@ namespace OculusSampleFramework
                     {
                         if (!IsWaiting)
                         {
-                            if (forceLevel == "1.0")
+                            if (forceLevel == "1")
                             {
                                 _currForceState = ForceState.SoftDown;
-                            } else if (forceLevel == "2.0")     // Advantage entering into 3-Moderate state
+                            } else if (forceLevel == "2")     // Advantage entering into 3-Moderate state
                             {
                                 _currForceState = ForceState.SoftDown;
-                            } else if (forceLevel == "0.0")
+                            } else if (forceLevel == "0")
                             {
                                 _currForceState = ForceState.NoneDown;
                             }
@@ -138,13 +139,13 @@ namespace OculusSampleFramework
                 case ForceState.NoneDown:   //0-None
                     if (isPinching)
                     {
-                        if (forceLevel == "2.0")
+                        if (forceLevel == "2")
                         {
                             _currForceState = ForceState.HardDown;
-                        } else if (forceLevel == "1.0")
-                        {
-                            _currForceState = ForceState.SoftDown;
-                        } else if (forceLevel == "0.0")
+                        // } else if (forceLevel == "1")
+                        // {
+                        //     _currForceState = ForceState.SoftDown;
+                        } else if (forceLevel == "0")
                         {
                             _currForceState = ForceState.NoneStay;
                         }
@@ -158,10 +159,10 @@ namespace OculusSampleFramework
                 case ForceState.NoneStay:   //0-None
                     if (isPinching)
                     {
-                        if(forceLevel == "2.0")
+                        if(forceLevel == "2")
                         {
                             _currForceState = ForceState.HardDown;
-                        // } else if (forceLevel == "1.0")
+                        // } else if (forceLevel == "1")
                         // {
                         //     _currForceState = ForceState.SoftDown;
                         } else
@@ -178,7 +179,7 @@ namespace OculusSampleFramework
                 case ForceState.SoftStay:
                     if (isPinching)
                     {
-                        if (forceLevel == "2.0")
+                        if (forceLevel == "2")
                         {
                             _currForceState = ForceState.HardDown;
                         } else
@@ -195,7 +196,7 @@ namespace OculusSampleFramework
                 case ForceState.HardStay:
                     if (isPinching)
                     {
-                        if (forceLevel == "0.0")
+                        if (forceLevel == "0")
                         {
                             _currForceState = ForceState.NoneDown;
                         } else

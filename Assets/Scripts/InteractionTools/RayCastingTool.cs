@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -12,17 +13,44 @@ namespace OculusSampleFramework
     public class RayCastingTool : MonoBehaviour
     {
         [SerializeField] private RayVisualizer _rayVisualizer = null;
-        [SerializeField] private float _rayMaxDistance = 4.2f; // 6.13f;
+        [SerializeField] private float _rayLength = 4.2f; // 6.13f;
         [SerializeField] private ForceLevelManager _forceLevelManager = null;
         [SerializeField] private Transform _parentTransform;
 
-        private const float CD_GAIN = 0.15f;
+        public enum RayState
+        {
+            CoarsePointing = 0,
+            CoarseDragging,
+            PrecisePointing,
+            PreciseDragging
+        }
+
+        public RayState RayInputState
+        {
+            get
+            {
+                if(_currIsPinching && _currIsHolding && !_currIsPreciseMode)
+                {
+                    return RayState.CoarseDragging;
+                } else if(_currIsPinching && !_currIsHolding && _currIsPreciseMode)
+                {
+                    return RayState.PrecisePointing;
+                } else if(_currIsPinching && _currIsHolding && _currIsPreciseMode)
+                {
+                    return RayState.PreciseDragging;
+                }
+                return RayState.CoarsePointing;
+            }
+        }
+
+        private const float CD_GAIN = 0.07f;
         private const int NUM_MAX_HITS = 10;
         private const float MIN_RAYCAST_DISTANCE = 0.3f;
+        private const float MAX_RAYCAST_DISTANCE = 4.2f;
 
         public Transform RayTransform { get { return this.transform;} }
         public bool IsRightHandedTool { get; set; }
-        public int _raycastingMode = 1;
+        public int _raycastingMode = 4;
         public OVRHand _hand;
         private ForceStateModule _forceStateModule = new ForceStateModule();
         public TextMeshProUGUI _text;
@@ -31,6 +59,8 @@ namespace OculusSampleFramework
         private bool _prevIsHolding = false;
         private bool _currIsPreciseMode = false;
         private bool _prevIsPreciseMode = false;
+        private bool _currIsPinching = false;
+        private bool _prevIsPinching = false;
         private bool _refPointSaved = false;
 
         private List<TargetSphere> _prevTargetsHit = new List<TargetSphere>();
@@ -87,17 +117,30 @@ namespace OculusSampleFramework
             _prevIsPreciseMode = _currIsPreciseMode;
             _currIsPreciseMode = _forceStateModule.IsInPreciseMode;            
             // UpdateCastedRay(_raycastingMode, _prevIsPreciseMode, _currIsPreciseMode);
+            _prevIsPinching = _currIsPinching;
+            _currIsPinching = _forceStateModule.IsPinching;
+
             updateCastedRayDelegate?.Invoke(_prevIsPreciseMode, _currIsPreciseMode);
+
             if(_grabbedObj == null)
             {
                 FindTargetSphere();
             }
             
-            if(!ForceRelease(_prevIsPreciseMode, _currIsPreciseMode))
+            // if(!ForceRelease(_prevIsPreciseMode, _currIsPreciseMode))
+            if(!ForceReleaseByPinch(_prevIsPinching, _currIsPinching))
             {
                 _prevIsHolding = _currIsHolding;
                 _currIsHolding = _forceStateModule.IsHolding;
                 CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
+            }
+            _rayVisualizer.SetRayState(RayInputState);
+            if(_currIsHolding)
+            {
+                _rayVisualizer.SetRayLength(_rayLength);
+            } else
+            {
+                _rayVisualizer.SetRayLength(MAX_RAYCAST_DISTANCE);
             }
         }
 
@@ -110,6 +153,9 @@ namespace OculusSampleFramework
                     break;
                 case 3:
                     updateCastedRayDelegate = ForceCtrlRay;
+                    break;
+                case 4:
+                    updateCastedRayDelegate = ForceCtrlRayAnchored;
                     break;
                 default:
                     updateCastedRayDelegate = null;
@@ -200,6 +246,9 @@ namespace OculusSampleFramework
                     prevPointingForward = transform.forward;
                     prevResultForward = newForward;
                     transform.forward = newForward;
+                } else if (_forceStateModule.IsPinching && !prevIsPreciseMode && !currIsPreciseMode)
+                {
+                    _refPointSaved = false;
                 } else if (!_forceStateModule.IsPinching)
                 {
                     _refPointSaved = false;
@@ -207,6 +256,54 @@ namespace OculusSampleFramework
             }
 
             // _grabbedObj.transform.localPosition = _grabbedObjPosOff;
+        }
+
+        public void ForceCtrlRayAnchored(bool prevIsPreciseMode, bool currIsPreciseMode)
+        {
+            if (!_refPointSaved)
+            {
+                if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
+                {
+                    prevPointingForward = transform.forward;
+                    prevResultForward = transform.forward;
+
+                } else if(_forceStateModule.IsPinching && prevIsPreciseMode && currIsPreciseMode)   //prevents "jump" of grabbed object
+                {
+                    Vector3 worldPos = new Vector3();
+                    if(_grabbedObj != null)
+                    {
+                        worldPos = _grabbedObj.transform.position;
+                    }
+                    var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
+                    prevPointingForward = transform.forward;
+                    prevResultForward = newForward;
+                    transform.forward = newForward;
+                    if(_grabbedObj != null)
+                    {
+                        _grabbedObj.transform.position = worldPos;
+                    }
+                    _refPointSaved = true;
+                }
+            } else
+            {
+                if(_forceStateModule.IsPinching && currIsPreciseMode)
+                {
+                    var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
+                    prevPointingForward = transform.forward;
+                    prevResultForward = newForward;
+                    transform.forward = newForward;
+                } else if(!_forceStateModule.IsPinching)
+                {
+                    _refPointSaved = false;
+                } else
+                {
+                    var deltaForward = prevResultForward - prevPointingForward;
+                    var newForward = transform.forward + deltaForward;
+                    prevPointingForward = transform.forward;
+                    prevResultForward = newForward;
+                    transform.forward = newForward;
+                }
+            }
         }
 
         private TargetSphere FindTargetSphere()
@@ -241,6 +338,7 @@ namespace OculusSampleFramework
 
             if(targetHit != null)
             {
+                _rayLength = (targetHit.transform.position - transform.position).magnitude;
                 foreach(TargetSphere sphere in _prevTargetsHit)
                 {
                     if(sphere != targetHit)
@@ -258,6 +356,7 @@ namespace OculusSampleFramework
                 }
             } else
             {
+                _rayLength = MAX_RAYCAST_DISTANCE;
                 foreach(TargetSphere sphere in _prevTargetsHit)
                 {
                     if (!sphere.IsGrabbed)
@@ -291,6 +390,16 @@ namespace OculusSampleFramework
         protected bool ForceRelease(bool prevIsPreciseMode, bool currIsPreciseMode)
         {
             if(prevIsPreciseMode && !currIsPreciseMode)
+            {
+                GrabEnd();
+                return true;
+            }
+            return false;
+        }
+        
+        protected bool ForceReleaseByPinch(bool prevIsPinching, bool currIsPinching)
+        {
+            if(prevIsPinching && !currIsPinching)
             {
                 GrabEnd();
                 return true;
