@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,13 @@ namespace OculusSampleFramework
         [SerializeField] private ForceLevelManager _forceLevelManager = null;
         [SerializeField] private Transform _parentTransform;
 
-        private const float CD_GAIN = 0.167f;
+        private const float CD_GAIN = 0.15f;
         private const int NUM_MAX_HITS = 10;
         private const float MIN_RAYCAST_DISTANCE = 0.3f;
 
         public Transform RayTransform { get { return this.transform;} }
         public bool IsRightHandedTool { get; set; }
-        public int _raycastingMode = 2;
+        public int _raycastingMode = 1;
         public OVRHand _hand;
         private ForceStateModule _forceStateModule = new ForceStateModule();
         public TextMeshProUGUI _text;
@@ -37,6 +38,8 @@ namespace OculusSampleFramework
         protected TargetSphere _grabbedObj = null;
         protected TargetSphere _prevGrabbedObj = null;
         protected Vector3 _grabbedObjPosOff;
+
+        private Action<bool, bool> updateCastedRayDelegate;
 
 
 
@@ -60,6 +63,7 @@ namespace OculusSampleFramework
             IsRightHandedTool = true;   // TODO: Connect to tool creator later
             _rayVisualizer._rayCastingTool = this;
             _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
+            SetRayMode(_raycastingMode);
         }
 
         // Update is called once per frame
@@ -82,8 +86,8 @@ namespace OculusSampleFramework
 
             _prevIsPreciseMode = _currIsPreciseMode;
             _currIsPreciseMode = _forceStateModule.IsInPreciseMode;            
-            UpdateCastedRay(_raycastingMode, _prevIsPreciseMode, _currIsPreciseMode);
-            Debug.Log("Mode input is:"+_raycastingMode.ToString());
+            // UpdateCastedRay(_raycastingMode, _prevIsPreciseMode, _currIsPreciseMode);
+            updateCastedRayDelegate?.Invoke(_prevIsPreciseMode, _currIsPreciseMode);
             if(_grabbedObj == null)
             {
                 FindTargetSphere();
@@ -97,19 +101,34 @@ namespace OculusSampleFramework
             }
         }
 
-        public void UpdateCastedRay(int mode, bool prevIsPreciseMode, bool currIsPreciseMode)
+        public void SetRayMode(int mode)
         {
-            Debug.Log("Mode is: "+mode.ToString());
             switch(mode)
             {
-                // case 1:
-                //     break;
+                case 2:
+                    updateCastedRayDelegate = CDGainRay;
+                    break;
+                case 3:
+                    updateCastedRayDelegate = ForceCtrlRay;
+                    break;
+                default:
+                    updateCastedRayDelegate = null;
+                    break;
+            }
+        }
+
+        public void UpdateCastedRay(int mode, bool prevIsPreciseMode, bool currIsPreciseMode)
+        {
+            switch(mode)
+            {
+                case 1:
+                    break;
                 case 2:
                     CDGainRay(prevIsPreciseMode, currIsPreciseMode);
                     break;
-                // case 3:
-                //     ForceCtrlRay(prevIsPreciseMode, currIsPreciseMode);
-                //     break;
+                case 3:
+                    ForceCtrlRay(prevIsPreciseMode, currIsPreciseMode);
+                    break;
             }
         }
 
@@ -125,6 +144,16 @@ namespace OculusSampleFramework
                 // _refPointSaved = true;
             }
             else if(_forceStateModule.IsPinching && currIsPreciseMode)
+            {
+                var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
+                var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+                prevPointingPosition = transform.position;
+                prevPointingForward = transform.forward;
+                prevResultPosition = newPosition;
+                prevResultForward = newForward;
+                transform.position = newPosition;
+                transform.forward = newForward;
+            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump"
             {
                 var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
                 var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
