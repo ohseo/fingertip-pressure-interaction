@@ -10,13 +10,13 @@ public class ExpSceneManager : MonoBehaviour
     public GameObject goalCubePrefab;
     private int _trialNum = 0;
 
-    private const int TARGET_NUM = 10;
+    private const int TARGET_NUM = 20;
     private const float DEPTH_RANGE = 0.1f;
-    private const float HORIZONTAL_RANGE_DEG = 20.0f;
-    private const float VERTICAL_RANGE_DEG = 10.0f;
+    private const float HORIZONTAL_RANGE_DEG = 10.0f;
+    private const float VERTICAL_RANGE_DEG = 5.0f;
     private const float GOAL_POSITION_DEG = 20.0f;
     private const float HORIZONTAL_BOUNDARY_OFFSET = 10.0f;
-    private const float VERTICAL_CENTER_OFFSET = -5.0f;
+    private const float VERTICAL_CENTER_OFFSET = 0.0f;
     private List<GameObject> _targets = new List<GameObject>();
 
     // Start is called before the first frame update
@@ -56,6 +56,10 @@ public class ExpSceneManager : MonoBehaviour
             Vector3 pos = new Vector3(x, y, z);
             GameObject sphere = Instantiate(targetSpherePrefab, pos, Quaternion.identity);
             sphere.transform.localScale *= _targetSize;
+            if(i==0)
+            {
+                sphere.GetComponent<TargetSphere>().IsExpTarget = true;
+            }
         }
     }
 

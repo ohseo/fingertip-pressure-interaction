@@ -9,13 +9,15 @@ public class TargetSphere : MonoBehaviour
     private Color selectedColor = Color.blue;
     private Color highlightedColor = Color.cyan;
     private Color goalinColor = Color.green;
+    private Color expTargetColor = Color.yellow;
 
     public bool IsGrabbed = false;
+    public bool IsExpTarget = false;
     // Start is called before the first frame update
     void Start()
     {
         sphereRenderer = gameObject.GetComponent<Renderer>();
-        sphereRenderer.material.color = defaultColor;
+        sphereRenderer.material.color = IsExpTarget ? expTargetColor : defaultColor;
     }
 
     // Update is called once per frame
@@ -31,7 +33,7 @@ public class TargetSphere : MonoBehaviour
 
     public void Mute()
     {
-        sphereRenderer.material.color = defaultColor;
+        sphereRenderer.material.color = IsExpTarget ? expTargetColor : defaultColor;
     }
 
     public void GrabBegin()

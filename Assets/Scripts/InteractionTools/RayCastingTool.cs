@@ -43,7 +43,7 @@ namespace OculusSampleFramework
             }
         }
 
-        private const float CD_GAIN = 0.07f;
+        private const float CD_GAIN = 0.089f;
         private const int NUM_MAX_HITS = 10;
         private const float MIN_RAYCAST_DISTANCE = 0.3f;
         private const float MAX_RAYCAST_DISTANCE = 4.2f;
@@ -157,6 +157,9 @@ namespace OculusSampleFramework
                 case 4:
                     updateCastedRayDelegate = ForceCtrlRayAnchored;
                     break;
+                case 5:
+                    updateCastedRayDelegate = CDGainRayAnchored;
+                    break;
                 default:
                     updateCastedRayDelegate = null;
                     break;
@@ -199,7 +202,7 @@ namespace OculusSampleFramework
                 prevResultForward = newForward;
                 transform.position = newPosition;
                 transform.forward = newForward;
-            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump"
+            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
             {
                 var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
                 var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
@@ -209,6 +212,60 @@ namespace OculusSampleFramework
                 prevResultForward = newForward;
                 transform.position = newPosition;
                 transform.forward = newForward;
+            }
+
+        }
+
+        private void CDGainRayAnchored(bool prevIsPreciseMode, bool currIsPreciseMode)
+        {
+            if(!_refPointSaved)
+            {
+                if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
+                {
+                    prevPointingPosition = transform.position;
+                    prevPointingForward = transform.forward;
+                    prevResultPosition = transform.position;
+                    prevResultForward = transform.forward;
+                    _refPointSaved = true;
+                }
+            } else
+            {
+                if(_forceStateModule.IsPinching && currIsPreciseMode)
+                {
+                    var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
+                    var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+                    prevPointingPosition = transform.position;
+                    prevPointingForward = transform.forward;
+                    prevResultPosition = newPosition;
+                    prevResultForward = newForward;
+                    transform.position = newPosition;
+                    transform.forward = newForward;
+                } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
+                {
+                    var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
+                    var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+                    prevPointingPosition = transform.position;
+                    prevPointingForward = transform.forward;
+                    prevResultPosition = newPosition;
+                    prevResultForward = newForward;
+                    transform.position = newPosition;
+                    transform.forward = newForward;
+                } else if (!_forceStateModule.IsPinching)
+                {
+                    _refPointSaved = false;
+                } else
+                {
+                    var deltaForward = prevResultForward - prevPointingForward;
+                    var newForward = transform.forward + deltaForward;
+                    var deltaPosition = prevResultPosition - prevPointingPosition;
+                    var newPosition = transform.position + deltaPosition;
+                    prevPointingForward = transform.forward;
+                    prevResultForward = newForward;
+                    prevPointingPosition = transform.position;
+                    prevResultPosition = newPosition;
+                    transform.forward = newForward;
+                    transform.position = newPosition;
+                }
             }
 
         }
@@ -240,7 +297,7 @@ namespace OculusSampleFramework
                     // prevPointingForward = transform.forward;
                     // prevResultForward = newForward;
                     // transform.forward = newForward;
-                } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevent "jump"
+                } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevent "jump" on release
                 {
                     var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
                     prevPointingForward = transform.forward;

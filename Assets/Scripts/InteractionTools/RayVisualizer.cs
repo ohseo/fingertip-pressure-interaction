@@ -27,14 +27,14 @@ namespace OculusSampleFramework
             );
             _coarseDraggingColorGradient = new Gradient();
             _coarseDraggingColorGradient.SetKeys(
-                new GradientColorKey[] { new GradientColorKey(new Color(0.40f, 0.90f, 0.90f), 0.0f),
-    	        	  new GradientColorKey(new Color(0.40f, 0.90f, 0.90f), 1.0f) },
+                new GradientColorKey[] { new GradientColorKey(new Color(0.0f, 0.90f, 0.90f), 0.0f),
+    	        	  new GradientColorKey(new Color(0.0f, 0.90f, 0.90f), 1.0f) },
 			    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
             );
             _precisePointingColorGradient = new Gradient();
             _precisePointingColorGradient.SetKeys(
-                new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.70f, 0.90f), 0.0f),
-    	        	  new GradientColorKey(new Color(0.90f, 0.40f, 0.90f), 1.0f) },
+                new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.0f, 0.90f), 0.0f),
+    	        	  new GradientColorKey(new Color(0.90f, 0.20f, 0.90f), 1.0f) },
 			    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
             );
             _preciseDraggingColorGradient = new Gradient();

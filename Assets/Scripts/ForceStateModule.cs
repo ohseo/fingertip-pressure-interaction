@@ -199,6 +199,9 @@ namespace OculusSampleFramework
                         if (forceLevel == "0")
                         {
                             _currForceState = ForceState.NoneDown;
+                        // } else if (forceLevel == "1")
+                        // {
+                        //     _currForceState = ForceState.NoneDown; //advantage entering coarse dragging state
                         } else
                         {
                             _currForceState = ForceState.HardStay;
