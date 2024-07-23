@@ -45,7 +45,7 @@ namespace OculusSampleFramework
 
         private const float CD_GAIN = 0.089f;
         private const int NUM_MAX_HITS = 10;
-        private const float MIN_RAYCAST_DISTANCE = 0.3f;
+        private const float MIN_RAYCAST_DISTANCE = 0.1f;
         private const float MAX_RAYCAST_DISTANCE = 4.2f;
 
         public Transform RayTransform { get { return this.transform;} }
@@ -91,7 +91,7 @@ namespace OculusSampleFramework
                 _parentTransform = gameObject.transform;
             }
             IsRightHandedTool = true;   // TODO: Connect to tool creator later
-            _rayVisualizer._rayCastingTool = this;
+            // _rayVisualizer._rayCastingTool = this;
             _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
             SetRayMode(_raycastingMode);
         }
@@ -490,7 +490,6 @@ namespace OculusSampleFramework
 
         void OnUDPReceive(string msg)
         {
-            _forceStateModule.IsWaiting = false;
         }
     }
 }

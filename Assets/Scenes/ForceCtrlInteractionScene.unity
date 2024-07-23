@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3f13b7f3f51b484eab20daa1c4e68bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetDepth: 1
+  _targetDepth: 0.5
   _targetSize: 0.01
   targetSpherePrefab: {fileID: 910188873547724215, guid: cff852b664a2070418e820f8ea5628b3,
     type: 3}
@@ -994,6 +994,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1050528103}
   - component: {fileID: 1050528104}
+  - component: {fileID: 1050528105}
   m_Layer: 0
   m_Name: RayCaster
   m_TagString: Untagged
@@ -1026,7 +1027,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1050528102}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 318b9313e4ae8774d849ad77bc0f6a9e, type: 3}
   m_Name: 
@@ -1036,6 +1037,23 @@ MonoBehaviour:
   _forceLevelManager: {fileID: 240104012}
   _parentTransform: {fileID: 0}
   _raycastingMode: 4
+  _hand: {fileID: 1265724860}
+  _text: {fileID: 0}
+--- !u!114 &1050528105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050528102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16844b881ac9d3f4b85e213cc1ef848f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rayVisualizer: {fileID: 62754174}
+  _rayLength: 4.2
+  _forceLevelManager: {fileID: 240104012}
   _hand: {fileID: 1265724860}
   _text: {fileID: 0}
 --- !u!1 &1053369122

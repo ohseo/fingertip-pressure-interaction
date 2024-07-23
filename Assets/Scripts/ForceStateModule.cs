@@ -24,8 +24,8 @@ namespace OculusSampleFramework
         
         private ForceState _currForceState;
         private ForceState _prevForceState;
-
-        public bool IsWaiting { get; set; }
+        public int _waitingCount { get; set; }
+        private const int WAITING_THRESHOLD = 20;
 
         public string currentForceState
         {
@@ -57,6 +57,35 @@ namespace OculusSampleFramework
             }
         }
 
+        public bool IsInCursorMode
+        {
+            get
+            {
+                return _currForceState == ForceState.SoftDown
+                    || _currForceState == ForceState.SoftStay
+                    || _currForceState == ForceState.HardDown
+                    || _currForceState == ForceState.HardStay;
+            }
+        }
+
+        public bool IsCursorHolding
+        {
+            get
+            {
+                return _currForceState == ForceState.HardDown
+                    || _currForceState == ForceState.HardStay;
+            }
+        }
+
+        public bool IsWaiting
+        {
+            get
+            {
+                return _currForceState == ForceState.PinchDown
+                    || _currForceState == ForceState.PinchStay;
+            }
+        }
+
         public bool IsPinching
         {
             get
@@ -65,22 +94,11 @@ namespace OculusSampleFramework
             }
         }
 
-        public bool IsDragging
-        {
-            get
-            {
-                return _currForceState == ForceState.NoneDown
-                    || _currForceState == ForceState.HardDown
-                    || _currForceState == ForceState.NoneStay
-                    || _currForceState == ForceState.HardStay;
-            }
-        }
-
         public ForceStateModule()
         {
             _currForceState = ForceState.PinchOpen;
             _prevForceState = ForceState.PinchOpen;
-            IsWaiting = true;
+            _waitingCount = 0;
         }
 
         public void UpdateState(OVRHand hand, string forceLevel) // Interactable
@@ -107,7 +125,7 @@ namespace OculusSampleFramework
                     if (isPinching)
                     {
                         _currForceState = ForceState.PinchStay;
-                        IsWaiting = true;
+                        _waitingCount = 0;;
                     }
                     else
                     {
@@ -117,7 +135,8 @@ namespace OculusSampleFramework
                 case ForceState.PinchStay:  //Pinch Stay
                     if (isPinching)
                     {
-                        if (!IsWaiting)
+                        _waitingCount++;
+                        if (_waitingCount > WAITING_THRESHOLD)
                         {
                             if (forceLevel == "1")
                             {

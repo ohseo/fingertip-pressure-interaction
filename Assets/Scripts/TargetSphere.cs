@@ -17,6 +17,12 @@ public class TargetSphere : MonoBehaviour
     void Start()
     {
         sphereRenderer = gameObject.GetComponent<Renderer>();
+        defaultColor.a = 0.5f;
+        selectedColor.a = 0.5f;
+        highlightedColor.a = 0.5f;
+        goalinColor.a = 0.5f;
+        expTargetColor.a = 0.5f;
+
         sphereRenderer.material.color = IsExpTarget ? expTargetColor : defaultColor;
     }
 
@@ -44,7 +50,6 @@ public class TargetSphere : MonoBehaviour
 
     public void GrabEnd()
     {
-        sphereRenderer.material.color = Color.white;
         IsGrabbed = false;
     }
 
@@ -58,9 +63,6 @@ public class TargetSphere : MonoBehaviour
         if(IsGrabbed)
         {
             sphereRenderer.material.color = selectedColor;
-        } else
-        {
-            sphereRenderer.material.color = Color.red;   
         }
     }
 }

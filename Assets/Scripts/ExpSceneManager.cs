@@ -1,17 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Oculus.Platform;
+using Oculus.Platform.Models;
 
 public class ExpSceneManager : MonoBehaviour
 {
-    public float _targetDepth = 1f;
+    public float _targetDepth = 0.5f;
     public float _targetSize = 0.01f;
     public GameObject targetSpherePrefab;
     public GameObject goalCubePrefab;
     private int _trialNum = 0;
 
-    private const int TARGET_NUM = 20;
-    private const float DEPTH_RANGE = 0.1f;
+    private const int TARGET_NUM = 10;
+    private const float DEPTH_RANGE = 0.10f;
     private const float HORIZONTAL_RANGE_DEG = 10.0f;
     private const float VERTICAL_RANGE_DEG = 5.0f;
     private const float GOAL_POSITION_DEG = 20.0f;
@@ -22,9 +24,10 @@ public class ExpSceneManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        OVRManager.display.RecenterPose();
         GenerateGoalCube();
         GenerateTargets();
-        // GenerateMinMax();
+        GenerateMinMax();
         // GenerateCenter();
     }
 

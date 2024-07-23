@@ -8,7 +8,7 @@ namespace OculusSampleFramework
     {
         [SerializeField] private LineRenderer _lineRenderer = null;
         [SerializeField] private float _rayLength = 4.2f;
-        public RayCastingTool _rayCastingTool { get; set; }
+        // public RayCastingTool _rayCastingTool { get; set; }
 
         private const int NUM_MAX_PRIMARY_HITS = 10;
         protected List<TargetSphere> _currIntersectingSpheres = new List<TargetSphere>();
@@ -87,6 +87,15 @@ namespace OculusSampleFramework
         public void SetRayLength(float length)
         {
             _lineRenderer.SetPosition(1, new Vector3(0, 0, length));
+        }
+
+        public void SetActive()
+        {
+            _lineRenderer.enabled = true;
+        }
+        public void SetInactive()
+        {
+            _lineRenderer.enabled = false;
         }
     }
 }
