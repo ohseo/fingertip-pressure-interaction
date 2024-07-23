@@ -77,6 +77,15 @@ namespace OculusSampleFramework
             }
         }
 
+        public bool IsRayHolding
+        {
+            get
+            {
+                return _currForceState == ForceState.NoneDown
+                    || _currForceState == ForceState.NoneStay;
+            }
+        }
+
         public bool IsWaiting
         {
             get

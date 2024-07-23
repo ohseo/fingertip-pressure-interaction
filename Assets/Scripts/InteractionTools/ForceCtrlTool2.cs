@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ForceCtrlTool : MonoBehaviour
+public class ForceCtrlTool2 : MonoBehaviour
 {
     
     [SerializeField] private RayVisualizer _rayVisualizer = null;
@@ -14,8 +14,8 @@ public class ForceCtrlTool : MonoBehaviour
     [SerializeField] private ForceLevelManager _forceLevelManager = null;
     public enum InputState
     {
-        None = 0,
-        RayActivated,
+        RayMode = 0,
+        RayDown,
         CursorControl,
         CursorDown
     }
@@ -26,7 +26,7 @@ public class ForceCtrlTool : MonoBehaviour
         {
             if(_currIsPinching && !_currIsCursorMode)
             {
-                return InputState.RayActivated;
+                return InputState.RayDown;
             } else if (_currIsPinching && _currIsCursorMode && !_currIsCursorHolding)
             {
                 return InputState.CursorControl;
@@ -34,7 +34,7 @@ public class ForceCtrlTool : MonoBehaviour
             {
                 return InputState.CursorDown;
             }
-            return InputState.None;
+            return InputState.RayMode;
         }
     }
 
@@ -55,6 +55,8 @@ public class ForceCtrlTool : MonoBehaviour
     private bool _prevIsCursorMode = false;
     private bool _currIsCursorHolding = false;
     private bool _prevIsCursorHolding = false;
+    private bool _currIsRayHolding = false;
+    private bool _prevIsRayHolding = false;
     private bool _prevIsWaiting = false;
     private bool _currIsWaiting = false;
 
@@ -119,41 +121,52 @@ public class ForceCtrlTool : MonoBehaviour
         _currIsCursorHolding = _forceStateModule.IsCursorHolding;
         _prevIsWaiting = _currIsWaiting;
         _currIsWaiting = _forceStateModule.IsWaiting;
+        _prevIsRayHolding = _currIsRayHolding;
+        _currIsRayHolding = _forceStateModule.IsRayHolding;
 
 
-        if (_currIsPinching && !_currIsCursorMode && !_currIsWaiting)
+        if(!_currIsPinching)
         {
-            if(_prevIsWaiting)
-            {
+            GrabEnd();
+            _headRenderer.enabled = true;
+            _rayVisualizer.SetActive();
+        }
+
+        if(!_currIsCursorMode && !_currIsWaiting)
+        {   
+            // if(_prevIsWaiting)
+            // {
                 _headRenderer.enabled = true;
                 _rayVisualizer.SetActive();
-            }
+            // }
+
+            CheckForGrabOrRelease(_prevIsRayHolding, _currIsRayHolding);
+            
             Vector3 intersectionPoint;
-            if (FindIntersection(out intersectionPoint))
+            if(FindIntersection(out intersectionPoint))
             {
                 _prevCursorPosition = _currCursorPosition;
                 _currCursorPosition = intersectionPoint;
                 _cursorMarker.transform.position = _currCursorPosition;
             }
-        } else if (_currIsPinching && _currIsCursorMode && !_currIsWaiting)
+
+        } else if(_currIsCursorMode && !_currIsWaiting)
         {
+            // if(_prevIsWaiting)
+            // {
+                _headRenderer.enabled = false;
+                _rayVisualizer.SetInactive();
+            // }
+            
+            CheckForGrabOrRelease(_prevIsCursorHolding, _currIsCursorHolding);
+
             MoveCursor();
-            _headRenderer.enabled = false;
-            _rayVisualizer.SetInactive();
-        } else
-        {
-            _headRenderer.enabled = false;
-            _rayVisualizer.SetInactive();
         }
 
         if(_grabbedObj == null)
         {
             FindTargetSphere();
         }
-
-        CheckForGrabOrRelease(_prevIsCursorHolding, _currIsCursorHolding);
-
-
     }
 
     private bool FindIntersection(out Vector3 intersection)
@@ -228,7 +241,7 @@ public class ForceCtrlTool : MonoBehaviour
 
         renderer.SetPosition(0, new Vector3(0, HEAD_RAY_OFFSET, RAY_ORIGIN_OFFSET));
         renderer.SetPosition(1, new Vector3(0, HEAD_RAY_OFFSET, _rayLength));
-        renderer.enabled = false;
+        // renderer.enabled = false;
     }
 
     private TargetSphere FindTargetSphere()
@@ -288,12 +301,12 @@ public class ForceCtrlTool : MonoBehaviour
         return targetHit;
     }
 
-    private void CheckForGrabOrRelease(bool prevIsCursorHolding, bool currIsCursorHolding)
+    private void CheckForGrabOrRelease(bool prevIsHolding, bool currIsHolding)
     {
-        if (!prevIsCursorHolding && currIsCursorHolding)
+        if (!prevIsHolding && currIsHolding)
         {
             GrabBegin();
-        } else if (prevIsCursorHolding && !currIsCursorHolding)
+        } else if (prevIsHolding && !currIsHolding)
         {
             GrabEnd();
         }

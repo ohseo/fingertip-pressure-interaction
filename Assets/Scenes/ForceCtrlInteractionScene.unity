@@ -216,7 +216,7 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.005
+    widthMultiplier: 0.001
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -995,6 +995,7 @@ GameObject:
   - component: {fileID: 1050528103}
   - component: {fileID: 1050528104}
   - component: {fileID: 1050528105}
+  - component: {fileID: 1050528106}
   m_Layer: 0
   m_Name: RayCaster
   m_TagString: Untagged
@@ -1046,9 +1047,26 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1050528102}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16844b881ac9d3f4b85e213cc1ef848f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rayVisualizer: {fileID: 62754174}
+  _rayLength: 4.2
+  _forceLevelManager: {fileID: 240104012}
+  _hand: {fileID: 1265724860}
+  _text: {fileID: 0}
+--- !u!114 &1050528106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050528102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e74360cecbe38df4890781cb461dfcb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _rayVisualizer: {fileID: 62754174}
