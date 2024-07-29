@@ -13,6 +13,8 @@ public class TargetSphere : MonoBehaviour
 
     public bool IsGrabbed = false;
     public bool IsExpTarget = false;
+    public bool IsStartingSphere = false;
+    public bool IsInGoal = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,11 +53,13 @@ public class TargetSphere : MonoBehaviour
     public void GrabEnd()
     {
         IsGrabbed = false;
+        this.transform.parent = null;
     }
 
     public void GoalIn()
     {
         sphereRenderer.material.color = goalinColor;
+        IsInGoal = true;
     }
 
     public void GoalOut()
@@ -64,5 +68,6 @@ public class TargetSphere : MonoBehaviour
         {
             sphereRenderer.material.color = selectedColor;
         }
+        IsInGoal = false;
     }
 }

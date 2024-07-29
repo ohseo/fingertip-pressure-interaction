@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ForceCtrlTool2 : MonoBehaviour
+public class Cursor3DTool2 : MonoBehaviour
 {
     
     [SerializeField] private RayVisualizer _rayVisualizer = null;
@@ -41,7 +41,7 @@ public class ForceCtrlTool2 : MonoBehaviour
     private const float CD_GAIN = 0.5f;
     private const float HEAD_RAY_OFFSET = -0.1f;
     private const float RAY_ORIGIN_OFFSET = 0.2f;
-    private const float CURSOR_SIZE = 0.002f;
+    private const float CURSOR_SIZE = 0.005f;
     private const int NUM_MAX_HITS = 10;
     public bool IsRightHandedTool { get; set; }
     public OVRHand _hand;
