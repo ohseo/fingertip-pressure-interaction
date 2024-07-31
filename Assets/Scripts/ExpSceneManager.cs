@@ -17,7 +17,7 @@ public class ExpSceneManager : MonoBehaviour
     public Vector3 _numGrid = new Vector3(3, 3, 3);
     public GameObject targetSpherePrefab;
     public GameObject goalCubePrefab;
-    public RayCastingTool rayCastingTool;
+    public RayModifyingTool rayModifyingTool;
     public BaselineRaycastingTool baselineRaycastingTool;
     private int _trialNum = 0;
 

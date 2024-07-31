@@ -61,19 +61,19 @@ public class RayVisualizer : MonoBehaviour
         // _lineRenderer.SetPosition(1, ray.origin + ray.direction * _rayLength);
     }
 
-    public void SetRayState(RayCastingTool.RayState state)
+    public void SetRayState(RayModifyingTool.RayState state)
     {
         switch(state)
         {
-            case RayCastingTool.RayState.CoarseDragging:
+            case RayModifyingTool.RayState.CoarseDragging:
                 _lineRenderer.widthMultiplier = 0.002f;
                 _lineRenderer.colorGradient = _coarseDraggingColorGradient;
                 break;
-            case RayCastingTool.RayState.PrecisePointing:
+            case RayModifyingTool.RayState.PrecisePointing:
                 _lineRenderer.widthMultiplier = 0.001f;
                 _lineRenderer.colorGradient = _precisePointingColorGradient;
                 break;
-            case RayCastingTool.RayState.PreciseDragging:
+            case RayModifyingTool.RayState.PreciseDragging:
                 _lineRenderer.widthMultiplier = 0.002f;
                 _lineRenderer.colorGradient = _preciseDraggingColorGradient;
                 break;
