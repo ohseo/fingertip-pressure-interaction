@@ -30,15 +30,18 @@ public class ExpSceneManager : MonoBehaviour
     private const float DEPTH_RANGE_M = 0.1f;
     private const float GOAL_POSITION_DEG = 20.0f;
     private const float TARGET_POSITION_DEG = 20.0f;
-    private const float TARGET_GRID_MARGIN = 0.005f;
+    private const float TARGET_GRID_MARGIN = 0.0075f;
     private const float VERTICAL_CENTER_OFFSET = 0.0f;
-    private const float TIME_OUT_THRESHOLD = 15.0f;
+    private const float TIME_OUT_THRESHOLD = 20.0f;
     private List<GameObject> _targets = new List<GameObject>();
     private List<GameObject> _internalTargets = new List<GameObject>();
     private GameObject _goal;
     private GameObject _center;
     private float _trialDuration;
+    [HideInInspector]
     public bool _isTimeout = false;
+    [HideInInspector]
+    public bool _isInTrial = false;
 
     // Start is called before the first frame update
     void Start()
@@ -50,12 +53,15 @@ public class ExpSceneManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _trialDuration += Time.deltaTime;
-
-        if(_trialDuration >= TIME_OUT_THRESHOLD)
+        if(_isInTrial)
         {
-            _isTimeout = true;
-            // EndTrial();
+            _trialDuration += Time.deltaTime;
+
+            if(_trialDuration >= TIME_OUT_THRESHOLD)
+            {
+                _isTimeout = true;
+                // EndTrial();
+            }
         }
     }
 
@@ -68,6 +74,7 @@ public class ExpSceneManager : MonoBehaviour
         // GenerateMinMax();
         _trialDuration = 0f;
         _isTimeout = false;
+        _isInTrial = true;
     }
 
     public void EndTrial()
@@ -80,6 +87,8 @@ public class ExpSceneManager : MonoBehaviour
         Destroy(_goal.gameObject);
         _goal = null;
         LoadNewScene();
+        _isTimeout = false;
+        _isInTrial = false;
     }
 
     private void LoadNewScene()

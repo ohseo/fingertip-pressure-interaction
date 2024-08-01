@@ -84,15 +84,15 @@ public class RayVisualizer : MonoBehaviour
         }
     }
 
-    public void SetRayState(BaselineRaycastingTool.BasicRayState state)
+    public void SetRayState(RaycastingTool.RayState state)
     {
         switch(state)
         {
-            case BaselineRaycastingTool.BasicRayState.Dragging:
+            case RaycastingTool.RayState.Dragging:
                 _lineRenderer.widthMultiplier = 0.002f;
                 _lineRenderer.colorGradient = _coarseDraggingColorGradient;
                 break;
-            case BaselineRaycastingTool.BasicRayState.Pointing:
+            case RaycastingTool.RayState.Pointing:
             default:
                 _lineRenderer.widthMultiplier = 0.001f;
                 _lineRenderer.colorGradient = _defaultColorGradient;

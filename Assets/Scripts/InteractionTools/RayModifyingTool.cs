@@ -6,15 +6,9 @@ using UnityEngine;
 using OculusSampleFramework;
 
 
-public class RayModifyingTool : MonoBehaviour
+public class RayModifyingTool : RaycastingTool
 {
-    [SerializeField] private RayVisualizer _rayVisualizer = null;
-    [SerializeField] private float _rayLength = 4.2f; // 6.13f;
-    [SerializeField] private ForceLevelManager _forceLevelManager = null;
-    [SerializeField] private ExpSceneManager _expSceneManager = null;
-    [SerializeField] private Transform _parentTransform;
-
-    public enum RayState
+    public new enum RayState
     {
         CoarsePointing = 0,
         CoarseDragging,
@@ -22,7 +16,7 @@ public class RayModifyingTool : MonoBehaviour
         PreciseDragging
     }
 
-    public RayState RayInputState
+    public new RayState RayInputState
     {
         get
         {
@@ -41,89 +35,38 @@ public class RayModifyingTool : MonoBehaviour
     }
 
     private const float CD_GAIN = 0.1f;
-    private const int NUM_MAX_HITS = 10;
-    private const float MIN_RAYCAST_DISTANCE = 0.1f;
-    private const float MAX_RAYCAST_DISTANCE = 4.2f;
-
-    public Transform RayTransform { get { return this.transform;} }
-    public bool IsRightHandedTool { get; set; }
     public int _raycastingMode = 4;
-    public OVRHand _hand;
-    private ForceStateModule _forceStateModule = new ForceStateModule();
-    public TextMeshProUGUI _text;
     private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
     private bool _currIsHolding = false;
     private bool _prevIsHolding = false;
     private bool _currIsPreciseMode = false;
     private bool _prevIsPreciseMode = false;
-    private bool _currIsPinching = false;
-    private bool _prevIsPinching = false;
     private bool _refPointSaved = false;
-
-    private List<TargetSphere> _prevTargetsHit = new List<TargetSphere>();
-    private RaycastHit[] _raycastHits = new RaycastHit[NUM_MAX_HITS];
-    protected TargetSphere _grabbedObj = null;
-    protected TargetSphere _prevGrabbedObj = null;
-    protected Vector3 _grabbedObjPosOff;
 
     private Action<bool, bool> updateCastedRayDelegate;
 
-
-
-    void Awake()
-    {
-        // OVRCameraRig rig = transform.GetComponentInParent<OVRCameraRig>();
-        // if (rig != null)
-        // {
-        //     rig.UpdatedAnchors += (r) => {OnUpdatedAnchors();};
-        // }
-        _forceLevelManager.udpManager.UDPReceiveHandler.AddListener(OnUDPReceive);
-    }
-
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        if(_parentTransform == null)
-        {
-            _parentTransform = gameObject.transform;
-        }
-        IsRightHandedTool = true;   // TODO: Connect to tool creator later
-        // _rayVisualizer._rayCastingTool = this;
-        _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
+        base.Start();
         SetRayMode(_raycastingMode);
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
-        if (!HandsManager.Instance || !HandsManager.Instance.IsInitialized())
-        {
-            return;
-        }
-
-        var hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
-
-        var pointer = _hand.PointerPose;
-
-        transform.position = pointer.position;
-        transform.rotation = pointer.rotation;
-
-        _forceStateModule.UpdateState(hand, _forceLevelManager.forceLevel);
-        _text.text = _forceStateModule.currentForceState.ToString();
+        base.Update();
 
         _prevIsPreciseMode = _currIsPreciseMode;
-        _currIsPreciseMode = _forceStateModule.IsInPreciseMode;            
-        // UpdateCastedRay(_raycastingMode, _prevIsPreciseMode, _currIsPreciseMode);
-        _prevIsPinching = _currIsPinching;
-        _currIsPinching = _forceStateModule.IsPinching;
+        _currIsPreciseMode = _forceStateModule.IsInPreciseMode;
 
         updateCastedRayDelegate?.Invoke(_prevIsPreciseMode, _currIsPreciseMode);
-
+        
         if(_grabbedObj == null)
         {
             FindTargetSphere();
         }
-        
+
         // if(!ForceRelease(_prevIsPreciseMode, _currIsPreciseMode))
         if(!ForceReleaseByPinch(_prevIsPinching, _currIsPinching))
         {
@@ -360,76 +303,7 @@ public class RayModifyingTool : MonoBehaviour
         }
     }
 
-    private TargetSphere FindTargetSphere()
-    {
-        var rayOrigin = GetRaycastOrigin(); //avoid collision with hand collider
-        var rayDirection = transform.forward;
-        TargetSphere targetHit = null;
-
-        int numHits = Physics.RaycastNonAlloc(new Ray(rayOrigin, rayDirection), _raycastHits);
-        float minHitDistance = 0.0f;
-        for (int i = 0; i < numHits; i++)
-        {
-            RaycastHit hit = _raycastHits[i];
-
-            //TODO: continue if the object is not a TargetSphere
-
-            TargetSphere currTarget = hit.collider.gameObject.GetComponent<TargetSphere>();
-
-            if (currTarget == null)
-            {
-                continue;
-            }
-
-            var distanceToTarget = (currTarget.transform.position - rayOrigin).magnitude;
-            
-            if (targetHit == null || distanceToTarget < minHitDistance)
-            {
-                targetHit = currTarget;
-                minHitDistance = distanceToTarget;
-            }
-        }
-
-        if(targetHit != null)
-        {
-            _rayLength = (targetHit.transform.position - transform.position).magnitude;
-            foreach(TargetSphere sphere in _prevTargetsHit)
-            {
-                if(sphere != targetHit)
-                {
-                    sphere.Mute();
-                }
-            }
-            if(!_prevTargetsHit.Contains(targetHit))
-            {
-                _prevTargetsHit.Add(targetHit);
-            }
-            if (!targetHit.IsGrabbed)
-            {
-                targetHit.Highlight();
-            }
-        } else
-        {
-            _rayLength = MAX_RAYCAST_DISTANCE;
-            foreach(TargetSphere sphere in _prevTargetsHit)
-            {
-                if (!sphere.IsGrabbed)
-                {
-                    sphere.Mute();  
-                }
-            }
-        }
-        
-
-        return targetHit;
-    }
-
-    private Vector3 GetRaycastOrigin()
-    {
-        return transform.position + MIN_RAYCAST_DISTANCE * transform.forward;
-    }
-
-    protected void CheckForGrabOrRelease(bool prevIsHolding, bool currIsHolding)
+    protected override void CheckForGrabOrRelease(bool prevIsHolding, bool currIsHolding)
     {
         if (!prevIsHolding && currIsHolding)
         {
@@ -459,44 +333,5 @@ public class RayModifyingTool : MonoBehaviour
             return true;
         }
         return false;
-    }
-
-    protected void GrabBegin()
-    {
-        _grabbedObj = FindTargetSphere();
-        if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
-        {
-            _expSceneManager.StartTrial();
-            _grabbedObj.GrabEnd();
-            // _grabbedObj.transform.parent = null;
-            _grabbedObj = null;
-            _prevTargetsHit.Clear();
-        } else if(_grabbedObj != null && _grabbedObj.IsExpTarget)
-        {
-            _grabbedObj.GrabBegin();
-            _grabbedObj.transform.parent = transform;
-            _grabbedObjPosOff = _grabbedObj.transform.localPosition;
-        }
-        _prevGrabbedObj = _grabbedObj;
-    }
-
-    protected void GrabEnd()
-    {
-        if(_grabbedObj != null)
-        {
-            _grabbedObj.GrabEnd();
-            // _grabbedObj.transform.parent = null;
-            if(_grabbedObj.IsInGoal)
-            {
-                _expSceneManager.EndTrial();
-            }
-            _grabbedObj = null;
-            _prevTargetsHit.Clear();
-        }
-        _prevGrabbedObj = _grabbedObj;
-    }
-
-    void OnUDPReceive(string msg)
-    {
     }
 }
