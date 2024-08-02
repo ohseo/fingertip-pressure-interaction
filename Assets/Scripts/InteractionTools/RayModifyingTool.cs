@@ -100,23 +100,11 @@ public class RayModifyingTool : RaycastingTool
             case 5:
                 updateCastedRayDelegate = CDGainRayAnchored;
                 break;
+            case 6:
+                updateCastedRayDelegate = CDGainForwardRay;
+                break;
             default:
                 updateCastedRayDelegate = null;
-                break;
-        }
-    }
-
-    public void UpdateCastedRay(int mode, bool prevIsPreciseMode, bool currIsPreciseMode)
-    {
-        switch(mode)
-        {
-            case 1:
-                break;
-            case 2:
-                CDGainRay(prevIsPreciseMode, currIsPreciseMode);
-                break;
-            case 3:
-                ForceCtrlRay(prevIsPreciseMode, currIsPreciseMode);
                 break;
         }
     }
@@ -208,6 +196,33 @@ public class RayModifyingTool : RaycastingTool
             }
         }
 
+    }
+
+    private void CDGainForwardRay(bool prevIsPreciseMode, bool currIsPreciseMode)
+    {
+        if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
+        {
+            prevPointingPosition = transform.position;
+            prevPointingForward = transform.forward;
+            prevResultPosition = transform.position;
+            prevResultForward = transform.forward;
+            // _refPointSaved = true;
+        }
+        else if(_forceStateModule.IsPinching && currIsPreciseMode)
+        {
+            var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+            prevPointingPosition = transform.position;
+            prevPointingForward = transform.forward;
+            prevResultForward = newForward;
+            transform.forward = newForward;
+        } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
+        {
+            var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+            prevPointingPosition = transform.position;
+            prevPointingForward = transform.forward;
+            prevResultForward = newForward;
+            transform.forward = newForward;
+        }
     }
 
     private void ForceCtrlRay(bool prevIsPreciseMode, bool currIsPreciseMode)

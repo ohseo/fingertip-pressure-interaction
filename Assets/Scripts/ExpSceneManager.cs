@@ -20,6 +20,7 @@ public class ExpSceneManager : MonoBehaviour
     public RayModifyingTool rayModifyingTool;
     public BaselineRaycastingTool baselineRaycastingTool;
     private int _trialNum = 0;
+    private int _currentTrial = 0;
 
     private const int TARGET_NUM = 20;
     private const float DEPTH_RANGE = 0.05f;

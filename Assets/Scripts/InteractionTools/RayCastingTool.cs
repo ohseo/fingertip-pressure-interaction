@@ -55,10 +55,10 @@ public class RaycastingTool : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        if(_parentTransform == null)
-        {
+        // if(_parentTransform == null)
+        // {
             _parentTransform = gameObject.transform;
-        }
+        // }
         IsRightHandedTool = true;   // TODO: Connect to tool creator later
         // _rayVisualizer._rayCastingTool = this;
         _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
@@ -78,14 +78,12 @@ public class RaycastingTool : MonoBehaviour
             return;
         }
 
-        var hand = IsRightHandedTool ? HandsManager.Instance.RightHand : HandsManager.Instance.LeftHand;
-
         var pointer = _hand.PointerPose;
 
         transform.position = pointer.position;
         transform.rotation = pointer.rotation;
 
-        _forceStateModule.UpdateState(hand, _forceLevelManager.forceLevel);
+        _forceStateModule.UpdateState(_hand, _forceLevelManager.forceLevel);
         _text.text = _forceStateModule.currentForceState.ToString();
 
         _prevIsPinching = _currIsPinching;
@@ -217,5 +215,20 @@ public class RaycastingTool : MonoBehaviour
         }
         _expSceneManager.EndTrial();
         _prevTargetsHit.Clear();
+    }
+
+    public void SetForceLevelManager(ForceLevelManager flm)
+    {
+        _forceLevelManager = flm;
+    }
+
+    public void SetExpSceneManager(ExpSceneManager esm)
+    {
+        _expSceneManager = esm;
+    }
+
+    public void SetHand(OVRHand hand)
+    {
+        _hand = hand;
     }
 }
