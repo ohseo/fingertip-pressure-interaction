@@ -67,12 +67,6 @@ public class RaycastingTool : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        if(_expSceneManager._isTimeout)
-        {
-            ForceEnd();
-            return;   
-        }
-
         if (!HandsManager.Instance || !HandsManager.Instance.IsInitialized())
         {
             return;
@@ -186,6 +180,11 @@ public class RaycastingTool : MonoBehaviour
             _grabbedObj.GrabBegin();
             _grabbedObj.transform.parent = transform;
             _grabbedObjPosOff = _grabbedObj.transform.localPosition;
+        } else if(_grabbedObj != null && !_grabbedObj.IsExpTarget)
+        {
+            _grabbedObj.GrabEnd();
+            _grabbedObj = null;
+            _prevTargetsHit.Clear();
         }
         _prevGrabbedObj = _grabbedObj;
     }
@@ -201,8 +200,8 @@ public class RaycastingTool : MonoBehaviour
                 _expSceneManager.EndTrial();
             }
             _grabbedObj = null;
-            _prevTargetsHit.Clear();
         }
+        _prevTargetsHit.Clear();
         _prevGrabbedObj = _grabbedObj;
     }
 
@@ -213,8 +212,8 @@ public class RaycastingTool : MonoBehaviour
             _grabbedObj.GrabEnd();
             _grabbedObj = null;
         }
-        _expSceneManager.EndTrial();
         _prevTargetsHit.Clear();
+        _expSceneManager.EndTrial();
     }
 
     public void SetForceLevelManager(ForceLevelManager flm)

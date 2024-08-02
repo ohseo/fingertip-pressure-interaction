@@ -57,6 +57,12 @@ public class RayModifyingTool : RaycastingTool
     {
         base.Update();
 
+        if(_expSceneManager._isTimeout)
+        {
+            ForceEnd();
+            return;   
+        }
+
         _prevIsPreciseMode = _currIsPreciseMode;
         _currIsPreciseMode = _forceStateModule.IsInPreciseMode;
 

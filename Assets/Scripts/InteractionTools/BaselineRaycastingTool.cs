@@ -11,6 +11,12 @@ public class BaselineRaycastingTool : RaycastingTool
     protected override void Update()
     {
         base.Update();
+        
+        if(_expSceneManager._isTimeout)
+        {
+            ForceEnd();
+            return;   
+        }
 
         if(_grabbedObj == null)
         {

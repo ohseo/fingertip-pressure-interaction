@@ -33,7 +33,7 @@ public class ExpSceneManager : MonoBehaviour
     private const float TARGET_POSITION_DEG = 20.0f;
     private const float TARGET_GRID_MARGIN = 0.0075f;
     private const float VERTICAL_CENTER_OFFSET = 0.0f;
-    private const float TIME_OUT_THRESHOLD = 20.0f;
+    private const float TIME_OUT_THRESHOLD = 10.0f;
     private List<GameObject> _targets = new List<GameObject>();
     private List<GameObject> _internalTargets = new List<GameObject>();
     private GameObject _goal;

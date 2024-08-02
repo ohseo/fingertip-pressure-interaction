@@ -53,10 +53,8 @@ public class ExpManager : MonoBehaviour
 
         RaycastingTool obj = Instantiate(tool);
         obj.name = "RaycastingTool";
-        obj.transform.parent = _hand.transform;
-        obj.transform.localPosition = Vector3.zero;
+        obj.transform.parent = _hand.transform.parent;
         obj.IsRightHandedTool = isRightHanded;
-        // obj.GetComponent<RaycastingTool>().IsRightHandedTool = isRightHanded; 
         obj.SetForceLevelManager(_forceLevelManager);
         obj.SetExpSceneManager(_expSceneManager);
         obj.SetHand(_hand);
