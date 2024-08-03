@@ -16,7 +16,7 @@ public class ExpManager : MonoBehaviour
     public RayModifyingTool _rayModifyingTool = null;
     public ForceLevelManager _forceLevelManager = null;
     public ExpSceneManager _expSceneManager = null;
-
+    //
     [HideInInspector] public OVRHand _hand = null;
 
     void Awake()
