@@ -11,6 +11,7 @@ public class RaycastingTool : MonoBehaviour
     [SerializeField] protected RayVisualizer _rayVisualizer = null;
     [SerializeField] protected float _rayLength = 4.2f; // 6.13f;
     [SerializeField] protected ForceLevelManager _forceLevelManager = null;
+    [SerializeField] protected ExpManager _expManager = null;
     [SerializeField] protected ExpSceneManager _expSceneManager = null;
     [SerializeField] protected Transform _parentTransform;
 
@@ -40,6 +41,7 @@ public class RaycastingTool : MonoBehaviour
 
     protected Transform pointer;
     public bool IsRightHandedTool { get; set; }
+    protected int _taskNumber { get; set; }
 
     public OVRHand _hand { get; set; }
     protected ForceStateModule _forceStateModule = new ForceStateModule();
@@ -53,16 +55,19 @@ public class RaycastingTool : MonoBehaviour
     protected TargetSphere _grabbedObj = null;
     protected TargetSphere _prevGrabbedObj = null;
     protected Vector3 _grabbedObjPosOff;
+
+    protected Action<bool, bool> interactionCheckDelegate;
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        // if(_parentTransform == null)
-        // {
+        if(_parentTransform == null)
+        {
             _parentTransform = gameObject.transform;
-        // }
+        }
         IsRightHandedTool = true;   // TODO: Connect to tool creator later
-        // _rayVisualizer._rayCastingTool = this;
         _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
+        // SetExpMode(_expManager._taskNum);
     }
 
     // Update is called once per frame
@@ -204,7 +209,12 @@ public class RaycastingTool : MonoBehaviour
         {
             _grabbedObj.GrabEnd();
             _grabbedObj = null;
-            _expSceneManager.NextTarget();
+            // SelectionSceneManager selectionSceneManager = _expSceneManager as SelectionSceneManager;
+            // if(selectionSceneManager != null)
+            // {
+            //     selectionSceneManager.NextTarget();
+            // }
+            ((SelectionSceneManager)_expSceneManager).NextTarget();
         }
         _prevTargetsHit.Clear();
         _prevGrabbedObj = _grabbedObj;
@@ -217,7 +227,7 @@ public class RaycastingTool : MonoBehaviour
         {
             _expSceneManager.StartTrial();
             _grabbedObj.GrabEnd();
-            // _grabbedObj.transform.parent = null;
+            _grabbedObj.transform.parent = null;
             _grabbedObj = null;
             _prevTargetsHit.Clear();
         } else if(_grabbedObj != null && _grabbedObj.IsExpTarget)
@@ -239,7 +249,7 @@ public class RaycastingTool : MonoBehaviour
         if(_grabbedObj != null)
         {
             _grabbedObj.GrabEnd();
-            // _grabbedObj.transform.parent = null;
+            _grabbedObj.transform.parent = null;
             if(_grabbedObj.IsInGoal)
             {
                 _expSceneManager.EndTrial();
@@ -266,6 +276,12 @@ public class RaycastingTool : MonoBehaviour
         _forceLevelManager = flm;
     }
 
+    public void SetExpManager(ExpManager em)
+    {
+        _expManager = em;
+        SetExpMode(_expManager._taskNum);
+    }
+
     public void SetExpSceneManager(ExpSceneManager esm)
     {
         _expSceneManager = esm;
@@ -274,5 +290,16 @@ public class RaycastingTool : MonoBehaviour
     public void SetHand(OVRHand hand)
     {
         _hand = hand;
+    }
+
+    public void SetExpMode(int mode)
+    {
+        if (mode == 1)
+        {
+            interactionCheckDelegate = CheckForSelection;
+        } else
+        {
+            interactionCheckDelegate = CheckForGrabOrRelease;
+        }  
     }
 }

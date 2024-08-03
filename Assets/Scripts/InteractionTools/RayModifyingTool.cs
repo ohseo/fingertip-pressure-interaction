@@ -34,7 +34,7 @@ public class RayModifyingTool : RaycastingTool
         }
     }
 
-    private const float CD_GAIN = 0.1f;
+    private const float CD_GAIN = 0.07f;
     public int _raycastingMode = 4;
     private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
     private bool _currIsHolding = false;
