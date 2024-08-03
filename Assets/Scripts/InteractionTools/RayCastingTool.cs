@@ -38,7 +38,7 @@ public class RaycastingTool : MonoBehaviour
     protected const float MIN_RAYCAST_DISTANCE = 0.1f;
     protected const float MAX_RAYCAST_DISTANCE = 4.2f;
 
-    private Transform pointer;
+    protected Transform pointer;
     public bool IsRightHandedTool { get; set; }
 
     public OVRHand _hand { get; set; }

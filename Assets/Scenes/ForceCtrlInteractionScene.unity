@@ -661,7 +661,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _participantNum: 0
   _expCondition: A
-  _raycastingMode: 6
+  _raycastingMode: 4
   _targetDepthCondition: 1
   _targetSizeCondition: 1
   _trialNum: 0

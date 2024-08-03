@@ -99,17 +99,19 @@ public class RayModifyingTool : RaycastingTool
                 updateCastedRayDelegate = CDGainRay;
                 break;
             case 3:
-                updateCastedRayDelegate = ForceCtrlRay;
-                break;
-            case 4:
-                updateCastedRayDelegate = ForceCtrlRayAnchored;
-                break;
-            case 5:
-                updateCastedRayDelegate = CDGainRayAnchored;
-                break;
-            case 6:
+                // updateCastedRayDelegate = ForceCtrlRay;
                 updateCastedRayDelegate = CDGainForwardRay;
                 break;
+            case 4:
+                updateCastedRayDelegate = ForceCtrlRay;
+                // updateCastedRayDelegate = ForceCtrlRayAnchored;
+                break;
+            // case 5:
+            //     updateCastedRayDelegate = CDGainRayAnchored;
+            //     break;
+            // case 6:
+            //     updateCastedRayDelegate = CDGainForwardRay;
+            //     break;
             default:
                 updateCastedRayDelegate = null;
                 break;
@@ -121,28 +123,28 @@ public class RayModifyingTool : RaycastingTool
 
         if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
         {
-            prevPointingPosition = transform.position;
-            prevPointingForward = transform.forward;
+            prevPointingPosition = pointer.position;
+            prevPointingForward = pointer.forward;
             prevResultPosition = transform.position;
             prevResultForward = transform.forward;
             // _refPointSaved = true;
         }
         else if(_forceStateModule.IsPinching && currIsPreciseMode)
         {
-            var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
-            var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = transform.position;
-            prevPointingForward = transform.forward;
+            var newPosition = (pointer.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
+            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+            prevPointingPosition = pointer.position;
+            prevPointingForward = pointer.forward;
             prevResultPosition = newPosition;
             prevResultForward = newForward;
             transform.position = newPosition;
             transform.forward = newForward;
         } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
         {
-            var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
-            var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = transform.position;
-            prevPointingForward = transform.forward;
+            var newPosition = (pointer.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
+            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+            prevPointingPosition = pointer.position;
+            prevPointingForward = pointer.forward;
             prevResultPosition = newPosition;
             prevResultForward = newForward;
             transform.position = newPosition;
@@ -209,24 +211,24 @@ public class RayModifyingTool : RaycastingTool
     {
         if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
         {
-            prevPointingPosition = transform.position;
-            prevPointingForward = transform.forward;
+            prevPointingPosition = pointer.position;
+            prevPointingForward = pointer.forward;
             prevResultPosition = transform.position;
             prevResultForward = transform.forward;
             // _refPointSaved = true;
         }
         else if(_forceStateModule.IsPinching && currIsPreciseMode)
         {
-            var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = transform.position;
-            prevPointingForward = transform.forward;
+            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+            prevPointingPosition = pointer.position;
+            prevPointingForward = pointer.forward;
             prevResultForward = newForward;
             transform.forward = newForward;
         } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
         {
-            var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = transform.position;
-            prevPointingForward = transform.forward;
+            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
+            prevPointingPosition = pointer.position;
+            prevPointingForward = pointer.forward;
             prevResultForward = newForward;
             transform.forward = newForward;
         }
@@ -239,7 +241,7 @@ public class RayModifyingTool : RaycastingTool
         {
             if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
             {
-                prevPointingForward = transform.forward;
+                prevPointingForward = pointer.forward;
                 prevResultForward = transform.forward;
                 _refPointSaved = true;
             } 
@@ -247,8 +249,8 @@ public class RayModifyingTool : RaycastingTool
         {
             if(_forceStateModule.IsPinching && currIsPreciseMode)
             {
-                var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
-                prevPointingForward = transform.forward;
+                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * CD_GAIN;
+                prevPointingForward = pointer.forward;
                 prevResultForward = newForward;
                 transform.forward = newForward;
             // } else if(!_forceStateModule.IsPinching)
@@ -261,8 +263,8 @@ public class RayModifyingTool : RaycastingTool
                 // transform.forward = newForward;
             } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevent "jump" on release
             {
-                var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
-                prevPointingForward = transform.forward;
+                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * CD_GAIN;
+                prevPointingForward = pointer.forward;
                 prevResultForward = newForward;
                 transform.forward = newForward;
             } else if (_forceStateModule.IsPinching && !prevIsPreciseMode && !currIsPreciseMode)
