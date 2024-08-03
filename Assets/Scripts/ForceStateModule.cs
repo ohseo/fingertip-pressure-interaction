@@ -226,8 +226,9 @@ public class ForceStateModule
                     if (forceLevel == "0")
                     {
                         _currForceState = ForceState.NoneDown;
-                    // } else if (forceLevel == "1")
-                    // {
+                    } else if (forceLevel == "1")
+                    {
+                        _currForceState = ForceState.SoftDown;
                     //     _currForceState = ForceState.NoneDown; //advantage entering coarse dragging state
                     } else
                     {

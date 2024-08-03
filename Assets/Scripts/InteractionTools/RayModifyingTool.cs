@@ -78,7 +78,8 @@ public class RayModifyingTool : RaycastingTool
         {
             _prevIsHolding = _currIsHolding;
             _currIsHolding = _forceStateModule.IsHolding;
-            CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
+            // CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
+            CheckForSelection(_prevIsHolding, _currIsHolding);
         }
         _rayVisualizer.SetRayState(RayInputState);
         if(_currIsHolding)
@@ -334,6 +335,17 @@ public class RayModifyingTool : RaycastingTool
             GrabEnd();
         }
 
+    }
+
+    protected override void CheckForSelection(bool prevIsHolding, bool currIsHolding)
+    {
+        if (!prevIsHolding && currIsHolding)
+        {
+            SelectionStart();
+        } else if (prevIsHolding && !currIsHolding)
+        {
+            SelectionEnd();
+        }
     }
 
     protected bool ForceRelease(bool prevIsPreciseMode, bool currIsPreciseMode)

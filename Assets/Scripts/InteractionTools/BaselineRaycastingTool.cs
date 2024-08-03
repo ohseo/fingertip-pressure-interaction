@@ -23,7 +23,8 @@ public class BaselineRaycastingTool : RaycastingTool
             FindTargetSphere();
         }
 
-        CheckForGrabOrRelease(_prevIsPinching, _currIsPinching);
+        // CheckForGrabOrRelease(_prevIsPinching, _currIsPinching);
+        CheckForSelection(_prevIsPinching, _currIsPinching);
 
         _rayVisualizer.SetRayState(RayInputState);
         if(_currIsPinching)

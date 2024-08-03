@@ -31,7 +31,13 @@ public class TargetSphere : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
+    }
+
+    public void MakeExpTarget()
+    {
+        IsExpTarget = true;
+        sphereRenderer.material.color = expTargetColor;
     }
 
     public void Highlight()

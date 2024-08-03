@@ -13,7 +13,7 @@ public class ExpManager : MonoBehaviour
     public int _trialNum = 0;
     public bool _isRightHanded = true;
     public RaycastingTool _baselineRaycastingTool = null;
-    public RaycastingTool _rayModifyingTool = null;
+    public RayModifyingTool _rayModifyingTool = null;
     public ForceLevelManager _forceLevelManager = null;
     public ExpSceneManager _expSceneManager = null;
 
@@ -27,12 +27,12 @@ public class ExpManager : MonoBehaviour
         } else
         {
             StartCoroutine(AttachToolToHand(_rayModifyingTool, _isRightHanded));
+            _rayModifyingTool._raycastingMode = _raycastingMode;
         }
     }
     // Start is called before the first frame update
     void Start()
     {
-
     }
 
     // Update is called once per frame

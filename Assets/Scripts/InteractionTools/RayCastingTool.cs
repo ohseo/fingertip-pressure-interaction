@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using OculusSampleFramework;
+using UnityEditor;
 
 public class RaycastingTool : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class RaycastingTool : MonoBehaviour
     protected const float MIN_RAYCAST_DISTANCE = 0.1f;
     protected const float MAX_RAYCAST_DISTANCE = 4.2f;
 
-    public Transform RayTransform { get { return this.transform;} }
+    private Transform pointer;
     public bool IsRightHandedTool { get; set; }
 
     public OVRHand _hand { get; set; }
@@ -72,7 +73,7 @@ public class RaycastingTool : MonoBehaviour
             return;
         }
 
-        var pointer = _hand.PointerPose;
+        pointer = _hand.PointerPose;
 
         transform.position = pointer.position;
         transform.rotation = pointer.rotation;
@@ -163,6 +164,50 @@ public class RaycastingTool : MonoBehaviour
             GrabEnd();
         }
 
+    }
+
+    protected virtual void CheckForSelection(bool prevIsPinching, bool currIsPinching)
+    {
+        if (!prevIsPinching && currIsPinching)
+        {
+            SelectionStart();
+        } else if (prevIsPinching && !currIsPinching)
+        {
+            SelectionEnd();
+        }
+    }
+
+    protected void SelectionStart()
+    {
+        _grabbedObj = FindTargetSphere();
+        if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
+        {
+            _expSceneManager.StartTrial();
+            _grabbedObj.GrabEnd();
+            _grabbedObj = null;
+            _prevTargetsHit.Clear();
+        } else if(_grabbedObj != null && _grabbedObj.IsExpTarget)
+        {
+            _grabbedObj.GrabBegin();
+        } else if(_grabbedObj != null && !_grabbedObj.IsExpTarget)
+        {
+            _grabbedObj.GrabEnd();
+            _grabbedObj = null;
+            _prevTargetsHit.Clear();
+        }
+        _prevGrabbedObj = _grabbedObj;
+    }
+
+    protected void SelectionEnd()
+    {
+        if(_grabbedObj != null && _grabbedObj.IsExpTarget)
+        {
+            _grabbedObj.GrabEnd();
+            _grabbedObj = null;
+            _expSceneManager.NextTarget();
+        }
+        _prevTargetsHit.Clear();
+        _prevGrabbedObj = _grabbedObj;
     }
 
     protected void GrabBegin()

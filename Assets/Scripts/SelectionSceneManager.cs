@@ -9,7 +9,7 @@ using System;
 using Random=UnityEngine.Random;
 
 
-public class ExpSceneManager : MonoBehaviour
+public class SelectionSceneManager : MonoBehaviour
 {
     public int _expCondition = 0;
     public float _targetDepth = 1.0f;
@@ -29,15 +29,13 @@ public class ExpSceneManager : MonoBehaviour
     private const float VERTICAL_RANGE_DEG = 5.0f;
     private const float VERTICAL_RANGE_M = 0.2f;
     private const float DEPTH_RANGE_M = 0.1f;
-    private const float GOAL_POSITION_DEG = 0.0f;
-    private const float TARGET_POSITION_DEG = 5.0f;
+    private const float GOAL_POSITION_DEG = 2.0f;
+    private const float TARGET_POSITION_DEG = 0f;
     private const float TARGET_GRID_MARGIN = 0.0075f;
     private const float VERTICAL_CENTER_OFFSET = 0.0f;
-    private const float TIME_OUT_THRESHOLD = 100.0f;
+    private const float TIME_OUT_THRESHOLD = 20.0f;
     private List<GameObject> _targets = new List<GameObject>();
     private List<GameObject> _internalTargets = new List<GameObject>();
-    private List<GameObject> _targetsToBe = new List<GameObject>();
-    private int _expTargetIndex;
     private GameObject _goal;
     private GameObject _center;
     private float _trialDuration;
@@ -86,28 +84,12 @@ public class ExpSceneManager : MonoBehaviour
         {
             Destroy(target);
         }
-        _internalTargets.Clear();
         _targets.Clear();
-        // Destroy(_goal.gameObject);
+        Destroy(_goal.gameObject);
         _goal = null;
         LoadNewScene();
         _isTimeout = false;
         _isInTrial = false;
-    }
-
-    public void NextTarget()
-    {
-        _internalTargets[_expTargetIndex].GetComponent<TargetSphere>().IsExpTarget = false;
-        _internalTargets.RemoveAt(_expTargetIndex);
-        if (_internalTargets.Count > 0)
-        {
-            int r = Random.Range(0, _internalTargets.Count-1);
-            _internalTargets[r].GetComponent<TargetSphere>().MakeExpTarget();
-            _expTargetIndex = r;   
-        } else
-        {
-            _isTimeout = true;
-        }
     }
 
     private void LoadNewScene()
@@ -155,13 +137,18 @@ public class ExpSceneManager : MonoBehaviour
         {
             _internalTargets.Clear();
         }
-
+        // float areaSize = 0.2f;
+        // int numGridX = 5;
+        // int numGridY = 3;
+        // int numGridZ = 3;
         Vector3 areaSize = new Vector3(HORIZONTAL_RANGE_M, VERTICAL_RANGE_M, DEPTH_RANGE_M);
+        // Vector3 numGrid = new Vector3(3, 3, 3);
         Vector3 targetPosition = new Vector3();
         targetPosition.x = Mathf.Sin(-TARGET_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth-areaSize.x/2f;
         targetPosition.y = Mathf.Sin(VERTICAL_CENTER_OFFSET * Mathf.Deg2Rad)*_targetDepth-areaSize.y/2f;
         targetPosition.z = Mathf.Cos(TARGET_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth-areaSize.z/2f;
 
+        // float gridSize = areaSize.x/numGrid.x;
         Vector3 gridSize = new Vector3(areaSize.x/_numGrid.x, areaSize.y/_numGrid.y, areaSize.z/_numGrid.z);
 
         for (int i=0; i<_numGrid.x; i++)
@@ -186,11 +173,8 @@ public class ExpSceneManager : MonoBehaviour
             }
         }
 
-        int r = Random.Range(0, _internalTargets.Count-1);
-        _internalTargets[r].GetComponent<TargetSphere>().IsExpTarget = true;
-        // int r = Random.Range(0, _targets.Count-1);
-        // _targets[r].GetComponent<TargetSphere>().IsExpTarget = true;
-        _expTargetIndex = r;        
+        int r = Random.Range(0, _internalTargets.Count);
+        _internalTargets[r].GetComponent<TargetSphere>().IsExpTarget = true;        
     }
 
     private void GenerateGoalCube()
