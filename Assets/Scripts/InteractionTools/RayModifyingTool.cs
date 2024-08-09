@@ -34,13 +34,16 @@ public class RayModifyingTool : RaycastingTool
         }
     }
 
-    private const float CD_GAIN = 0.07f;
+    private static float[] CD_GAINS = {0.29f, 0.038f, 0.025f};
+    private float _cdGain = 0.038f;
     public int _raycastingMode = 4;
     private Vector3 prevPointingPosition, prevPointingForward, prevResultPosition, prevResultForward;
     private bool _currIsHolding = false;
     private bool _prevIsHolding = false;
     private bool _currIsPreciseMode = false;
     private bool _prevIsPreciseMode = false;
+    private bool _currIsPreciseDragging = false;
+    private bool _prevIsPreciseDragging = false;
     private bool _refPointSaved = false;
 
     private Action<bool, bool> updateCastedRayDelegate;
@@ -76,11 +79,21 @@ public class RayModifyingTool : RaycastingTool
         // if(!ForceRelease(_prevIsPreciseMode, _currIsPreciseMode))
         if(!ForceReleaseByPinch(_prevIsPinching, _currIsPinching))
         {
-            _prevIsHolding = _currIsHolding;
-            _currIsHolding = _forceStateModule.IsHolding;
+            if(!_expSceneManager._isInTrial)
+            {
+                interactionCheckDelegate?.Invoke(_prevIsPinching, _currIsPinching);
+            }else
+            {
+                _prevIsHolding = _currIsHolding;
+                _currIsHolding = _forceStateModule.IsHolding;
+                // _prevIsPreciseDragging = _currIsPreciseDragging;
+                // _currIsPreciseDragging = _forceStateModule.IsPreciseDragging;
+                interactionCheckDelegate?.Invoke(_prevIsHolding, _currIsHolding);
+            }
             // CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
-            CheckForSelection(_prevIsHolding, _currIsHolding);
+            // CheckForSelection(_prevIsHolding, _currIsHolding);
         }
+
         _rayVisualizer.SetRayState(RayInputState);
         if(_currIsHolding)
         {
@@ -95,23 +108,18 @@ public class RayModifyingTool : RaycastingTool
     {
         switch(mode)
         {
-            case 2:
+            case 1:
                 updateCastedRayDelegate = CDGainRay;
+                _cdGain = CD_GAINS[0];
+                break;
+            case 2:
+                updateCastedRayDelegate = CDGainForwardRay;
+                _cdGain = CD_GAINS[1];
                 break;
             case 3:
-                // updateCastedRayDelegate = ForceCtrlRay;
-                updateCastedRayDelegate = CDGainForwardRay;
-                break;
-            case 4:
                 updateCastedRayDelegate = ForceCtrlRay;
-                // updateCastedRayDelegate = ForceCtrlRayAnchored;
+                _cdGain = CD_GAINS[2];
                 break;
-            // case 5:
-            //     updateCastedRayDelegate = CDGainRayAnchored;
-            //     break;
-            // case 6:
-            //     updateCastedRayDelegate = CDGainForwardRay;
-            //     break;
             default:
                 updateCastedRayDelegate = null;
                 break;
@@ -120,117 +128,118 @@ public class RayModifyingTool : RaycastingTool
 
     private void CDGainRay(bool prevIsPreciseMode, bool currIsPreciseMode)
     {
-
-        if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
-        {
-            prevPointingPosition = pointer.position;
-            prevPointingForward = pointer.forward;
-            prevResultPosition = transform.position;
-            prevResultForward = transform.forward;
-            // _refPointSaved = true;
-        }
-        else if(_forceStateModule.IsPinching && currIsPreciseMode)
-        {
-            var newPosition = (pointer.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
-            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = pointer.position;
-            prevPointingForward = pointer.forward;
-            prevResultPosition = newPosition;
-            prevResultForward = newForward;
-            transform.position = newPosition;
-            transform.forward = newForward;
-        } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
-        {
-            var newPosition = (pointer.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
-            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = pointer.position;
-            prevPointingForward = pointer.forward;
-            prevResultPosition = newPosition;
-            prevResultForward = newForward;
-            transform.position = newPosition;
-            transform.forward = newForward;
-        }
-
-    }
-
-    private void CDGainRayAnchored(bool prevIsPreciseMode, bool currIsPreciseMode)
-    {
         if(!_refPointSaved)
         {
             if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
             {
-                prevPointingPosition = transform.position;
-                prevPointingForward = transform.forward;
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
                 prevResultPosition = transform.position;
                 prevResultForward = transform.forward;
+            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && currIsPreciseMode)
+            {
+                Vector3 worldPos = new Vector3();
+                if(_grabbedObj != null)
+                {
+                    worldPos = _grabbedObj.transform.position;
+                }
+                    var newPosition = (pointer.position - prevPointingPosition) * _cdGain + prevResultPosition;
+                    var newForward = (pointer.forward - prevPointingForward) * _cdGain + prevResultForward;
+                    prevPointingPosition = pointer.position;
+                    prevPointingForward = pointer.forward;
+                    prevResultPosition = newPosition;
+                    prevResultForward = newForward;
+                    transform.position = newPosition;
+                    transform.forward = newForward;
+                if(_grabbedObj != null)
+                {
+                    _grabbedObj.transform.position = worldPos;
+                }
                 _refPointSaved = true;
             }
         } else
         {
             if(_forceStateModule.IsPinching && currIsPreciseMode)
             {
-                var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
-                var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-                prevPointingPosition = transform.position;
-                prevPointingForward = transform.forward;
+                var newPosition = (pointer.position - prevPointingPosition) * _cdGain + prevResultPosition;
+                var newForward = (pointer.forward - prevPointingForward) * _cdGain + prevResultForward;
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
                 prevResultPosition = newPosition;
                 prevResultForward = newForward;
                 transform.position = newPosition;
                 transform.forward = newForward;
             } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
             {
-                var newPosition = (transform.position - prevPointingPosition) * CD_GAIN + prevResultPosition;
-                var newForward = (transform.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-                prevPointingPosition = transform.position;
-                prevPointingForward = transform.forward;
+                var newPosition = (pointer.position - prevPointingPosition) * _cdGain + prevResultPosition;
+                var newForward = (pointer.forward - prevPointingForward) * _cdGain + prevResultForward;
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
                 prevResultPosition = newPosition;
                 prevResultForward = newForward;
                 transform.position = newPosition;
                 transform.forward = newForward;
+            } else if (_forceStateModule.IsPinching && !prevIsPreciseMode && !currIsPreciseMode)
+            {
+                _refPointSaved = false;
             } else if (!_forceStateModule.IsPinching)
             {
                 _refPointSaved = false;
-            } else
-            {
-                var deltaForward = prevResultForward - prevPointingForward;
-                var newForward = transform.forward + deltaForward;
-                var deltaPosition = prevResultPosition - prevPointingPosition;
-                var newPosition = transform.position + deltaPosition;
-                prevPointingForward = transform.forward;
-                prevResultForward = newForward;
-                prevPointingPosition = transform.position;
-                prevResultPosition = newPosition;
-                transform.forward = newForward;
-                transform.position = newPosition;
-            }
+            } 
         }
 
     }
 
     private void CDGainForwardRay(bool prevIsPreciseMode, bool currIsPreciseMode)
     {
-        if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
+        if(!_refPointSaved)
         {
-            prevPointingPosition = pointer.position;
-            prevPointingForward = pointer.forward;
-            prevResultPosition = transform.position;
-            prevResultForward = transform.forward;
-            // _refPointSaved = true;
-        }
-        else if(_forceStateModule.IsPinching && currIsPreciseMode)
-        {
-            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = pointer.position;
-            prevPointingForward = pointer.forward;
-            prevResultForward = newForward;
-            transform.forward = newForward;
-        } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
-        {
-            var newForward = (pointer.forward - prevPointingForward) * CD_GAIN + prevResultForward;
-            prevPointingPosition = pointer.position;
-            prevPointingForward = pointer.forward;
-            prevResultForward = newForward;
-            transform.forward = newForward;
+            if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
+            {
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
+                prevResultPosition = transform.position;
+                prevResultForward = transform.forward;
+            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && currIsPreciseMode)
+            {
+                Vector3 worldPos = new Vector3();
+                if(_grabbedObj != null)
+                {
+                    worldPos = _grabbedObj.transform.position;
+                }
+                var newForward = (pointer.forward - prevPointingForward) * _cdGain + prevResultForward;
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
+                prevResultForward = newForward;
+                transform.forward = newForward;
+                if(_grabbedObj != null)
+                {
+                    _grabbedObj.transform.position = worldPos;
+                }
+                _refPointSaved = true;
+            }
+        } else{
+            if(_forceStateModule.IsPinching && currIsPreciseMode)
+            {
+                var newForward = (pointer.forward - prevPointingForward) * _cdGain + prevResultForward;
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
+                prevResultForward = newForward;
+                transform.forward = newForward;
+            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevents "jump" on release
+            {
+                var newForward = (pointer.forward - prevPointingForward) * _cdGain + prevResultForward;
+                prevPointingPosition = pointer.position;
+                prevPointingForward = pointer.forward;
+                prevResultForward = newForward;
+                transform.forward = newForward;
+            } else if (_forceStateModule.IsPinching && !prevIsPreciseMode && !currIsPreciseMode)
+            {
+                _refPointSaved = false;
+            } else if (!_forceStateModule.IsPinching)
+            {
+                _refPointSaved = false;
+            }
         }
     }
 
@@ -243,27 +252,34 @@ public class RayModifyingTool : RaycastingTool
             {
                 prevPointingForward = pointer.forward;
                 prevResultForward = transform.forward;
+            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && currIsPreciseMode)   //prevents "jump" of grabbed object
+            {
+                Vector3 worldPos = new Vector3();
+                if(_grabbedObj != null)
+                {
+                    worldPos = _grabbedObj.transform.position;
+                }
+                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * _cdGain;
+                prevPointingForward = pointer.forward;
+                prevResultForward = newForward;
+                transform.forward = newForward;
+                if(_grabbedObj != null)
+                {
+                    _grabbedObj.transform.position = worldPos;
+                }
                 _refPointSaved = true;
             } 
         } else
         {
             if(_forceStateModule.IsPinching && currIsPreciseMode)
             {
-                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * CD_GAIN;
+                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * _cdGain;
                 prevPointingForward = pointer.forward;
                 prevResultForward = newForward;
                 transform.forward = newForward;
-            // } else if(!_forceStateModule.IsPinching)
-            // {
-            //     _refPointSaved = false;
-                // var deltaForward = prevResultForward - prevPointingForward;
-                // var newForward = transform.forward + deltaForward;
-                // prevPointingForward = transform.forward;
-                // prevResultForward = newForward;
-                // transform.forward = newForward;
             } else if(_forceStateModule.IsPinching && prevIsPreciseMode && !currIsPreciseMode) // prevent "jump" on release
             {
-                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * CD_GAIN;
+                var newForward = prevResultForward - (pointer.forward - prevPointingForward) * _cdGain;
                 prevPointingForward = pointer.forward;
                 prevResultForward = newForward;
                 transform.forward = newForward;
@@ -273,56 +289,6 @@ public class RayModifyingTool : RaycastingTool
             } else if (!_forceStateModule.IsPinching)
             {
                 _refPointSaved = false;
-            }
-        }
-
-        // _grabbedObj.transform.localPosition = _grabbedObjPosOff;
-    }
-
-    public void ForceCtrlRayAnchored(bool prevIsPreciseMode, bool currIsPreciseMode)
-    {
-        if (!_refPointSaved)
-        {
-            if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
-            {
-                prevPointingForward = transform.forward;
-                prevResultForward = transform.forward;
-
-            } else if(_forceStateModule.IsPinching && prevIsPreciseMode && currIsPreciseMode)   //prevents "jump" of grabbed object
-            {
-                Vector3 worldPos = new Vector3();
-                if(_grabbedObj != null)
-                {
-                    worldPos = _grabbedObj.transform.position;
-                }
-                var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
-                prevPointingForward = transform.forward;
-                prevResultForward = newForward;
-                transform.forward = newForward;
-                if(_grabbedObj != null)
-                {
-                    _grabbedObj.transform.position = worldPos;
-                }
-                _refPointSaved = true;
-            }
-        } else
-        {
-            if(_forceStateModule.IsPinching && currIsPreciseMode)
-            {
-                var newForward = prevResultForward - (transform.forward - prevPointingForward) * CD_GAIN;
-                prevPointingForward = transform.forward;
-                prevResultForward = newForward;
-                transform.forward = newForward;
-            } else if(!_forceStateModule.IsPinching)
-            {
-                _refPointSaved = false;
-            } else
-            {
-                var deltaForward = prevResultForward - prevPointingForward;
-                var newForward = transform.forward + deltaForward;
-                prevPointingForward = transform.forward;
-                prevResultForward = newForward;
-                transform.forward = newForward;
             }
         }
     }

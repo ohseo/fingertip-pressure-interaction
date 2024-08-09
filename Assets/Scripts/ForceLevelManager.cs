@@ -36,7 +36,7 @@ public class ForceLevelManager : MonoBehaviour
     {
         // forceLevel = udpManager.lastForceLevel;
         Parser(udpManager.lastMessage);
-        udpTextMesh.text = forceLevel;
+        // udpTextMesh.text = forceLevel;
     }
 
     private void Parser(string message)

@@ -138,16 +138,18 @@ public class RaycastingTool : MonoBehaviour
             {
                 targetHit.Highlight();
             }
+            // _text.text = "targetHit";
         } else
         {
             _rayLength = MAX_RAYCAST_DISTANCE;
             foreach(TargetSphere sphere in _prevTargetsHit)
             {
-                if (!sphere.IsGrabbed)
-                {
+                // if (!sphere.IsGrabbed)
+                // {
                     sphere.Mute();  
-                }
+                // }
             }
+            // _text.text = "Null";
         }
         
 
@@ -297,9 +299,11 @@ public class RaycastingTool : MonoBehaviour
         if (mode == 1)
         {
             interactionCheckDelegate = CheckForSelection;
+            _forceStateModule.SetTaskNum(mode);
         } else
         {
             interactionCheckDelegate = CheckForGrabOrRelease;
+            _forceStateModule.SetTaskNum(mode);
         }  
     }
 }

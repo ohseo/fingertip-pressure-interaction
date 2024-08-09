@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 59e9fddc38d83c84689eb3deb601b970, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.019649595, g: 0.026991498, b: 0.048993997, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -605,10 +605,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _participantNum: 0
   _taskNum: 2
-  _raycastingMode: 0
+  _raycastingMode: 1
   _targetDepthCondition: 1
-  _targetDensityCondition: 1
-  _trialNum: 0
+  _targetDensityCondition: 2
   _isRightHanded: 1
   _baselineRaycastingTool: {fileID: 6575072930710463596, guid: 2f0a1cf37f913f042aeadb98a23b68e8,
     type: 3}
@@ -619,7 +618,7 @@ MonoBehaviour:
   _hand: {fileID: 0}
   targetSpherePrefab: {fileID: 910188873547724215, guid: cff852b664a2070418e820f8ea5628b3,
     type: 3}
-  goalCubePrefab: {fileID: 7227475035893414437, guid: e38ca39d4eaaec7488c91e54348471ac,
+  goalCubePrefab: {fileID: 1119778555937758726, guid: cd38c90cbab30aa40a72e1611758f195,
     type: 3}
 --- !u!4 &805676890
 Transform:
@@ -788,7 +787,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1053369123
 RectTransform:
   m_ObjectHideFlags: 0

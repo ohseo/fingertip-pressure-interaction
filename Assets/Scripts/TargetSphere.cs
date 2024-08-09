@@ -60,6 +60,7 @@ public class TargetSphere : MonoBehaviour
     {
         IsGrabbed = false;
         this.transform.parent = null;
+        sphereRenderer.material.color = defaultColor;
     }
 
     public void GoalIn()

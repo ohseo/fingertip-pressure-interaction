@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GoalCube : MonoBehaviour
 {
+    private const float OVERLAP_THRESHOLD = 0.01f;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,7 +31,11 @@ public class GoalCube : MonoBehaviour
         TargetSphere targetSphere = collider.gameObject.GetComponent<TargetSphere>();
         if(targetSphere != null)
         {
-            targetSphere.GoalOut();
+            // bool overlap = Mathf.Abs((transform.position - targetSphere.transform.position).magnitude) < OVERLAP_THRESHOLD;
+            // if(!overlap)
+            // {
+                targetSphere.GoalOut();
+            // }
         }
     }
 }

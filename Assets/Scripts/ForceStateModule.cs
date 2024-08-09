@@ -23,8 +23,9 @@ public class ForceStateModule
     
     private ForceState _currForceState;
     private ForceState _prevForceState;
-    public int _waitingCount { get; set; }
+    private int _waitingCount { get; set; }
     private const int WAITING_THRESHOLD = 20;
+    private int _taskNum = 1;
 
     public string currentForceState
     {
@@ -56,6 +57,16 @@ public class ForceStateModule
         }
     }
 
+    public bool IsPreciseDragging
+    {
+        get
+        {
+            return _currForceState == ForceState.HardDown
+                || _currForceState == ForceState.HardStay;
+        }
+    }
+
+    // for 3d cursor
     public bool IsInCursorMode
     {
         get
@@ -84,6 +95,8 @@ public class ForceStateModule
                 || _currForceState == ForceState.NoneStay;
         }
     }
+
+    // end for 3d cursor
 
     public bool IsWaiting
     {
@@ -148,13 +161,19 @@ public class ForceStateModule
                     {
                         if (forceLevel == "1")
                         {
-                            _currForceState = ForceState.SoftDown;
-                        } else if (forceLevel == "2")     // Advantage entering into 3-Moderate state
+                            if(_taskNum == 1)
+                            {
+                                _currForceState = ForceState.SoftDown;
+                            }
+                        } else if (forceLevel == "2")
                         {
-                            _currForceState = ForceState.SoftDown;
+                            _currForceState = ForceState.HardDown;
                         } else if (forceLevel == "0")
                         {
-                            _currForceState = ForceState.NoneDown;
+                            if(_taskNum == 2)
+                            {
+                                _currForceState = ForceState.NoneDown;
+                            }
                         }
                     }
                 }
@@ -223,17 +242,17 @@ public class ForceStateModule
             case ForceState.HardStay:
                 if (isPinching)
                 {
-                    if (forceLevel == "0")
-                    {
-                        _currForceState = ForceState.NoneDown;
-                    } else if (forceLevel == "1")
-                    {
-                        _currForceState = ForceState.SoftDown;
-                    //     _currForceState = ForceState.NoneDown; //advantage entering coarse dragging state
-                    } else
-                    {
+                    // if (forceLevel == "0")
+                    // {
+                        // _currForceState = ForceState.NoneDown;
+                    // } else if (forceLevel == "1")
+                    // {
+                        // _currForceState = ForceState.SoftDown;
+                        // _currForceState = ForceState.NoneDown; //advantage entering coarse dragging state
+                    // } else
+                    // {
                         _currForceState = ForceState.HardStay;
-                    }
+                    // }
                 }
                 else
                 {
@@ -241,5 +260,10 @@ public class ForceStateModule
                 }
                 break;
         }
+    }
+
+    public void SetTaskNum(int num)
+    {
+        _taskNum = num;
     }
 }

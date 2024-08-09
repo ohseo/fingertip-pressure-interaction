@@ -17,9 +17,11 @@ public class SelectionSceneManager : ExpSceneManager
     private const float TARGET_POSITION_DEG = 0f;
     private const float TARGET_GRID_MARGIN = 0.01f;
     private const float VERTICAL_CENTER_OFFSET = 0.0f;
+    private const int SEQUENCE_LENGTH = 1;
     private List<GameObject> _targets = new List<GameObject>();
     private List<GameObject> _internalTargets = new List<GameObject>();
     private int _expTargetIndex;
+    private int _expTargetCount = 0;
 
     public override void StartTrial()
     {
@@ -28,6 +30,7 @@ public class SelectionSceneManager : ExpSceneManager
         _trialDuration = 0f;
         _isTimeout = false;
         _isInTrial = true;
+        _expTargetCount = 0;
     }
 
     public override void EndTrial()
@@ -41,17 +44,25 @@ public class SelectionSceneManager : ExpSceneManager
         LoadNewScene();
         _isTimeout = false;
         _isInTrial = false;
+        _expTargetCount = 0;
     }
 
     public void NextTarget()
     {
+        _expTargetCount++;
+        if(_expTargetCount == SEQUENCE_LENGTH)
+        {
+            EndTrial();
+            return;
+        }
         _internalTargets[_expTargetIndex].GetComponent<TargetSphere>().IsExpTarget = false;
         _internalTargets.RemoveAt(_expTargetIndex);
         if (_internalTargets.Count > 0)
         {
             int r = Random.Range(0, _internalTargets.Count-1);
             _internalTargets[r].GetComponent<TargetSphere>().MakeExpTarget();
-            _expTargetIndex = r;   
+            _expTargetIndex = r;
+            
         } else
         {
             _isTimeout = true;
@@ -90,13 +101,14 @@ public class SelectionSceneManager : ExpSceneManager
                                                 y+j*gridSize.y+targetPosition.y,
                                                 z+k*gridSize.z+targetPosition.z);
                     GameObject sphere = Instantiate(targetSpherePrefab, pos, Quaternion.identity);
-                    sphere.transform.localScale *= _targetSize;
+                    sphere.transform.localScale *= TARGET_SIZE;
                     _targets.Add(sphere);
 
-                    if(i>0 && i<_numGrid.x-1 && j>0 && j<_numGrid.y-1 && k>0 && k<_numGrid.z-1)
-                    {
+                    // if(i>0 && i<_numGrid.x-1 && j>0 && j<_numGrid.y-1 && k>0 && k<_numGrid.z-1)
+                    // if(i>0 && i<_numGrid.x-1 && j>0 && j<_numGrid.y-1 && k==0)
+                    // {
                         _internalTargets.Add(sphere);
-                    }
+                    // }
                 }
             }
         }
@@ -104,5 +116,6 @@ public class SelectionSceneManager : ExpSceneManager
         int r = Random.Range(0, _internalTargets.Count-1);
         _internalTargets[r].GetComponent<TargetSphere>().IsExpTarget = true;        
         _expTargetIndex = r;
+        _expTargetCount++;
     }
 }

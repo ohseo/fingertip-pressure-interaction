@@ -7,10 +7,9 @@ public class ExpManager : MonoBehaviour
 {
     public int _participantNum = 0;
     public int _taskNum = 1;
-    public int _raycastingMode = 0;
-    public int _targetDepthCondition = 1;
-    public int _targetDensityCondition = 1;
-    public int _trialNum = 0;
+    public int _raycastingMode = 0; //0: Baseline, 1: CDHand, 2: CDDirection, 3: ForceCtrl
+    public int _targetDepthCondition = 1; //1: 1.0f, 2: 2.0f
+    public int _targetDensityCondition = 1; //1: sparse, 2: dense
     public bool _isRightHanded = true;
     public RaycastingTool _baselineRaycastingTool = null;
     public RayModifyingTool _rayModifyingTool = null;
@@ -37,12 +36,14 @@ public class ExpManager : MonoBehaviour
             SelectionSceneManager ssm = new SelectionSceneManager();
             _expSceneManager = (ExpSceneManager)ssm;
             _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
+            _expSceneManager.SetExpConditions(_targetDepthCondition, _targetDensityCondition);
             _expSceneManager.Init();
         } else
         {
             CubeSceneManager csm = new CubeSceneManager();
             _expSceneManager = (ExpSceneManager)csm;
             _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
+            _expSceneManager.SetExpConditions(_targetDepthCondition, _targetDensityCondition);
             _expSceneManager.Init();
         }
     }
