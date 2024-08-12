@@ -33,9 +33,16 @@ public class CubeSceneManager : ExpSceneManager
         Destroy(_goal.gameObject);
         _target = null;
         _goal = null;
-        LoadNewScene();
+        _currentTrial++;
         _isTimeout = false;
         _isInTrial = false;
+        if(_currentTrial > MAX_TRIAL_NUM)
+        {
+            _text.text = "Set Finished";
+            EndSet();
+            return;
+        }
+        LoadNewScene();
     }
 
     protected override void GenerateTargets()

@@ -15,10 +15,15 @@ public class ExpManager : MonoBehaviour
     public RayModifyingTool _rayModifyingTool = null;
     public ForceLevelManager _forceLevelManager = null;
     [HideInInspector] public ExpSceneManager _expSceneManager = null;
+    private GameObject _expSceneManagerGO;
 
     [HideInInspector] public OVRHand _hand = null;
     public GameObject targetSpherePrefab;
     public GameObject goalCubePrefab;
+
+    public bool _forceSetAndTrial = false;
+    public int _forceSetNum = 0;
+    public int _forceTrialNum = 0;
 
     void Awake()
     {
@@ -31,21 +36,25 @@ public class ExpManager : MonoBehaviour
             _rayModifyingTool._raycastingMode = _raycastingMode;
         }
 
+        GameObject go = new GameObject("ExpSceneManager");
+
         if(_taskNum == 1)
         {
-            SelectionSceneManager ssm = new SelectionSceneManager();
+            SelectionSceneManager ssm = go.AddComponent<SelectionSceneManager>();
             _expSceneManager = (ExpSceneManager)ssm;
-            _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
-            _expSceneManager.SetExpConditions(_targetDepthCondition, _targetDensityCondition);
-            _expSceneManager.Init();
         } else
         {
-            CubeSceneManager csm = new CubeSceneManager();
+            CubeSceneManager csm = go.AddComponent<CubeSceneManager>();
             _expSceneManager = (ExpSceneManager)csm;
-            _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
-            _expSceneManager.SetExpConditions(_targetDepthCondition, _targetDensityCondition);
-            _expSceneManager.Init();
         }
+
+        _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
+        _expSceneManager.SetExpConditions(_targetDepthCondition, _targetDensityCondition);
+        if(_forceSetAndTrial)
+        {
+            _expSceneManager.ForceSetAndTrial(_forceSetAndTrial, _forceSetNum, _forceTrialNum);
+        }
+        _expSceneManager.Init();
     }
     // Start is called before the first frame update
     void Start()
@@ -55,7 +64,7 @@ public class ExpManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private IEnumerator AttachToolToHand(RaycastingTool tool, bool isRightHanded)

@@ -17,6 +17,7 @@ public class SelectionSceneManager : ExpSceneManager
     private const float TARGET_POSITION_DEG = 0f;
     private const float TARGET_GRID_MARGIN = 0.01f;
     private const float VERTICAL_CENTER_OFFSET = 0.0f;
+    private const float TARGET_DEPTH_MARGIN = 0.05f;
     private const int SEQUENCE_LENGTH = 1;
     private List<GameObject> _targets = new List<GameObject>();
     private List<GameObject> _internalTargets = new List<GameObject>();
@@ -41,10 +42,17 @@ public class SelectionSceneManager : ExpSceneManager
         }
         _internalTargets.Clear();
         _targets.Clear();
-        LoadNewScene();
         _isTimeout = false;
         _isInTrial = false;
         _expTargetCount = 0;
+        _currentTrial++;
+        if(_currentTrial > MAX_TRIAL_NUM)
+        {
+            _text.text = "Set Finished";
+            EndSet();
+            return;
+        }
+        LoadNewScene();
     }
 
     public void NextTarget()
@@ -97,7 +105,7 @@ public class SelectionSceneManager : ExpSceneManager
                     float x = Random.Range(TARGET_GRID_MARGIN, gridSize.x-TARGET_GRID_MARGIN);
                     float y = Random.Range(TARGET_GRID_MARGIN, gridSize.y-TARGET_GRID_MARGIN);
                     float z = Random.Range(TARGET_GRID_MARGIN, gridSize.z-TARGET_GRID_MARGIN);
-                    Vector3 pos = new Vector3(x+i*gridSize.x+targetPosition.x, //+(float)Math.Pow(-1.0,k+1)*gridSize.x/4f, 
+                    Vector3 pos = new Vector3(x+i*gridSize.x+targetPosition.x,
                                                 y+j*gridSize.y+targetPosition.y,
                                                 z+k*gridSize.z+targetPosition.z);
                     GameObject sphere = Instantiate(targetSpherePrefab, pos, Quaternion.identity);
@@ -105,10 +113,10 @@ public class SelectionSceneManager : ExpSceneManager
                     _targets.Add(sphere);
 
                     // if(i>0 && i<_numGrid.x-1 && j>0 && j<_numGrid.y-1 && k>0 && k<_numGrid.z-1)
-                    // if(i>0 && i<_numGrid.x-1 && j>0 && j<_numGrid.y-1 && k==0)
-                    // {
+                    if(pos.z > targetPosition.z+TARGET_DEPTH_MARGIN && pos.z < targetPosition.z+DEPTH_RANGE_M-TARGET_DEPTH_MARGIN)
+                    {
                         _internalTargets.Add(sphere);
-                    // }
+                    }
                 }
             }
         }

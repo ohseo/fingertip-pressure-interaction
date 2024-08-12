@@ -76,7 +76,6 @@ public class RayModifyingTool : RaycastingTool
             FindTargetSphere();
         }
 
-        // if(!ForceRelease(_prevIsPreciseMode, _currIsPreciseMode))
         if(!ForceReleaseByPinch(_prevIsPinching, _currIsPinching))
         {
             if(!_expSceneManager._isInTrial)
@@ -86,12 +85,8 @@ public class RayModifyingTool : RaycastingTool
             {
                 _prevIsHolding = _currIsHolding;
                 _currIsHolding = _forceStateModule.IsHolding;
-                // _prevIsPreciseDragging = _currIsPreciseDragging;
-                // _currIsPreciseDragging = _forceStateModule.IsPreciseDragging;
                 interactionCheckDelegate?.Invoke(_prevIsHolding, _currIsHolding);
             }
-            // CheckForGrabOrRelease(_prevIsHolding, _currIsHolding);
-            // CheckForSelection(_prevIsHolding, _currIsHolding);
         }
 
         _rayVisualizer.SetRayState(RayInputState);
@@ -245,7 +240,6 @@ public class RayModifyingTool : RaycastingTool
 
     private void ForceCtrlRay(bool prevIsPreciseMode, bool currIsPreciseMode)
     {
-        // if (prevPointingForward == null)
         if (!_refPointSaved)
         {
             if(_forceStateModule.IsPinching && !prevIsPreciseMode && currIsPreciseMode)
