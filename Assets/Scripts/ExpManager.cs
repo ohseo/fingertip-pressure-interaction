@@ -15,6 +15,7 @@ public class ExpManager : MonoBehaviour
     public RayModifyingTool _rayModifyingTool = null;
     public ForceLevelManager _forceLevelManager = null;
     [HideInInspector] public ExpSceneManager _expSceneManager = null;
+    [HideInInspector] public ExpLogManager _expLogManager = null;
     private GameObject _expSceneManagerGO;
 
     [HideInInspector] public OVRHand _hand = null;
@@ -36,15 +37,15 @@ public class ExpManager : MonoBehaviour
             _rayModifyingTool._raycastingMode = _raycastingMode;
         }
 
-        GameObject go = new GameObject("ExpSceneManager");
+        GameObject sceneGO = new GameObject("ExpSceneManager");
 
         if(_taskNum == 1)
         {
-            SelectionSceneManager ssm = go.AddComponent<SelectionSceneManager>();
+            SelectionSceneManager ssm = sceneGO.AddComponent<SelectionSceneManager>();
             _expSceneManager = (ExpSceneManager)ssm;
         } else
         {
-            CubeSceneManager csm = go.AddComponent<CubeSceneManager>();
+            CubeSceneManager csm = sceneGO.AddComponent<CubeSceneManager>();
             _expSceneManager = (ExpSceneManager)csm;
         }
 
@@ -55,6 +56,10 @@ public class ExpManager : MonoBehaviour
             _expSceneManager.ForceSetAndTrial(_forceSetAndTrial, _forceSetNum, _forceTrialNum);
         }
         _expSceneManager.Init();
+
+        GameObject logGO = new GameObject("ExpLogManager");
+        _expLogManager = logGO.AddComponent<ExpLogManager>();
+        _expLogManager.SetExpSceneManager(_expSceneManager);
     }
     // Start is called before the first frame update
     void Start()

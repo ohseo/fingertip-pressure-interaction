@@ -32,10 +32,12 @@ public class SelectionSceneManager : ExpSceneManager
         _isTimeout = false;
         _isInTrial = true;
         _expTargetCount = 0;
+        _startTrialEvent.Invoke();
     }
 
     public override void EndTrial()
     {
+        _endTrialEvent.Invoke(_trialDuration, _isTimeout);
         foreach(GameObject target in _targets)
         {
             Destroy(target);
@@ -110,6 +112,7 @@ public class SelectionSceneManager : ExpSceneManager
                                                 z+k*gridSize.z+targetPosition.z);
                     GameObject sphere = Instantiate(targetSpherePrefab, pos, Quaternion.identity);
                     sphere.transform.localScale *= TARGET_SIZE;
+                    sphere.GetComponent<TargetSphere>().targetIndex = _targets.Count;
                     _targets.Add(sphere);
 
                     // if(i>0 && i<_numGrid.x-1 && j>0 && j<_numGrid.y-1 && k>0 && k<_numGrid.z-1)
@@ -122,7 +125,8 @@ public class SelectionSceneManager : ExpSceneManager
         }
 
         int r = Random.Range(0, _internalTargets.Count-1);
-        _internalTargets[r].GetComponent<TargetSphere>().IsExpTarget = true;        
+        _internalTargets[r].GetComponent<TargetSphere>().MakeExpTarget();
+        // _internalTargets[r].GetComponent<TargetSphere>().IsExpTarget = true;
         _expTargetIndex = r;
         _expTargetCount++;
     }

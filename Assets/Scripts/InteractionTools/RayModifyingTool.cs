@@ -45,6 +45,7 @@ public class RayModifyingTool : RaycastingTool
     private bool _currIsPreciseDragging = false;
     private bool _prevIsPreciseDragging = false;
     private bool _refPointSaved = false;
+    private RayState _prevRayState;
 
     private Action<bool, bool> updateCastedRayDelegate;
 
@@ -90,6 +91,14 @@ public class RayModifyingTool : RaycastingTool
         }
 
         _rayVisualizer.SetRayState(RayInputState);
+        if(_expSceneManager._isInTrial)
+        {
+            if(_prevRayState != RayInputState)
+            {
+                Debug.Log("Logger: ray state changed: from "+_prevRayState.ToString()+" to "+RayInputState.ToString());
+            }
+        }
+        _prevRayState = RayInputState;
         if(_currIsHolding)
         {
             _rayVisualizer.SetRayLength(_rayLength);

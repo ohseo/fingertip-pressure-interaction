@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using OculusSampleFramework;
 using UnityEditor;
+using Oculus.Interaction;
 
 public class RaycastingTool : MonoBehaviour
 {
@@ -50,11 +51,13 @@ public class RaycastingTool : MonoBehaviour
     protected bool _currIsPinching = false;
     protected bool _prevIsPinching = false;
 
-    protected List<TargetSphere> _prevTargetsHit = new List<TargetSphere>();
+    protected List<TargetSphere> _prevTargetsHitList = new List<TargetSphere>();
+    protected TargetSphere _prevTargetHit = null;
     protected RaycastHit[] _raycastHits = new RaycastHit[NUM_MAX_HITS];
     protected TargetSphere _grabbedObj = null;
     protected TargetSphere _prevGrabbedObj = null;
     protected Vector3 _grabbedObjPosOff;
+    protected Vector3 _goalOffset;
 
     protected Action<bool, bool> interactionCheckDelegate;
 
@@ -123,16 +126,16 @@ public class RaycastingTool : MonoBehaviour
         if(targetHit != null)
         {
             _rayLength = (targetHit.transform.position - transform.position).magnitude;
-            foreach(TargetSphere sphere in _prevTargetsHit)
+            foreach(TargetSphere sphere in _prevTargetsHitList)
             {
                 if(sphere != targetHit)
                 {
                     sphere.Mute();
                 }
             }
-            if(!_prevTargetsHit.Contains(targetHit))
+            if(!_prevTargetsHitList.Contains(targetHit))
             {
-                _prevTargetsHit.Add(targetHit);
+                _prevTargetsHitList.Add(targetHit);
             }
             if (!targetHit.IsGrabbed)
             {
@@ -142,7 +145,7 @@ public class RaycastingTool : MonoBehaviour
         } else
         {
             _rayLength = MAX_RAYCAST_DISTANCE;
-            foreach(TargetSphere sphere in _prevTargetsHit)
+            foreach(TargetSphere sphere in _prevTargetsHitList)
             {
                 // if (!sphere.IsGrabbed)
                 // {
@@ -151,8 +154,19 @@ public class RaycastingTool : MonoBehaviour
             }
             // _text.text = "Null";
         }
-        
 
+        if(targetHit != _prevTargetHit)
+        {
+            //Invoke
+            if(_expSceneManager._isInTrial)
+            {
+                string tgstr = targetHit == null ? "null" : targetHit.targetIndex.ToString();
+                string prevtgstr = _prevTargetHit == null ? "null" : _prevTargetHit.targetIndex.ToString();
+                Debug.Log("Logger: target change occurred: "+prevtgstr+" to "+tgstr);
+            }
+        }
+        
+        _prevTargetHit = targetHit;
         return targetHit;
     }
 
@@ -187,12 +201,19 @@ public class RaycastingTool : MonoBehaviour
     protected void SelectionStart()
     {
         _grabbedObj = FindTargetSphere();
+
+        if(_expSceneManager._isInTrial)
+        {
+            string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
+            Debug.Log("Logger: object selected: "+objstr);
+        }
+
         if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
         {
             _expSceneManager.StartTrial();
             _grabbedObj.GrabEnd();
             _grabbedObj = null;
-            _prevTargetsHit.Clear();
+            _prevTargetsHitList.Clear();
         } else if(_grabbedObj != null && _grabbedObj.IsExpTarget)
         {
             _grabbedObj.GrabBegin();
@@ -200,7 +221,7 @@ public class RaycastingTool : MonoBehaviour
         {
             _grabbedObj.GrabEnd();
             _grabbedObj = null;
-            _prevTargetsHit.Clear();
+            _prevTargetsHitList.Clear();
         }
         _prevGrabbedObj = _grabbedObj;
     }
@@ -218,20 +239,27 @@ public class RaycastingTool : MonoBehaviour
             // }
             ((SelectionSceneManager)_expSceneManager).NextTarget();
         }
-        _prevTargetsHit.Clear();
+        _prevTargetsHitList.Clear();
         _prevGrabbedObj = _grabbedObj;
     }
 
     protected void GrabBegin()
     {
         _grabbedObj = FindTargetSphere();
+
+        if(_expSceneManager._isInTrial)
+        {
+            string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
+            Debug.Log("Logger: object grabbed: "+objstr);
+        }
+
         if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
         {
             _expSceneManager.StartTrial();
             _grabbedObj.GrabEnd();
             _grabbedObj.transform.parent = null;
             _grabbedObj = null;
-            _prevTargetsHit.Clear();
+            _prevTargetsHitList.Clear();
         } else if(_grabbedObj != null && _grabbedObj.IsExpTarget)
         {
             _grabbedObj.GrabBegin();
@@ -241,13 +269,19 @@ public class RaycastingTool : MonoBehaviour
         {
             _grabbedObj.GrabEnd();
             _grabbedObj = null;
-            _prevTargetsHit.Clear();
+            _prevTargetsHitList.Clear();
         }
         _prevGrabbedObj = _grabbedObj;
     }
 
     protected void GrabEnd()
     {
+        if(_expSceneManager._isInTrial)
+        {
+            string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
+            Debug.Log("Logger: object released: "+objstr);
+        }
+
         if(_grabbedObj != null)
         {
             _grabbedObj.GrabEnd();
@@ -258,7 +292,7 @@ public class RaycastingTool : MonoBehaviour
             }
             _grabbedObj = null;
         }
-        _prevTargetsHit.Clear();
+        _prevTargetsHitList.Clear();
         _prevGrabbedObj = _grabbedObj;
     }
 
@@ -269,7 +303,7 @@ public class RaycastingTool : MonoBehaviour
             _grabbedObj.GrabEnd();
             _grabbedObj = null;
         }
-        _prevTargetsHit.Clear();
+        _prevTargetsHitList.Clear();
         _expSceneManager.EndTrial();
     }
 

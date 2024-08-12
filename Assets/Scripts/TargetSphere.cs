@@ -15,6 +15,7 @@ public class TargetSphere : MonoBehaviour
     public bool IsExpTarget = false;
     public bool IsStartingSphere = false;
     public bool IsInGoal = false;
+    public int targetIndex = 100;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,7 +38,7 @@ public class TargetSphere : MonoBehaviour
     public void MakeExpTarget()
     {
         IsExpTarget = true;
-        sphereRenderer.material.color = expTargetColor;
+        // sphereRenderer.material.color = expTargetColor;
     }
 
     public void Highlight()

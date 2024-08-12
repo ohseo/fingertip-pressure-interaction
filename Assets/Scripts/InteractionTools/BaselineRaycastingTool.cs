@@ -6,6 +6,7 @@ using TMPro;
 
 public class BaselineRaycastingTool : RaycastingTool
 {
+    private RayState _prevRayState;
 
     // Update is called once per frame
     protected override void Update()
@@ -28,6 +29,14 @@ public class BaselineRaycastingTool : RaycastingTool
         // CheckForSelection(_prevIsPinching, _currIsPinching);
 
         _rayVisualizer.SetRayState(RayInputState);
+        if(_expSceneManager._isInTrial)
+        {
+            if(_prevRayState != RayInputState)
+            {
+                Debug.Log("Logger: ray state changed: from "+_prevRayState.ToString()+" to "+RayInputState.ToString());
+            }
+        }
+        _prevRayState = RayInputState;
         if(_currIsPinching)
         {
             _rayVisualizer.SetRayLength(_rayLength);

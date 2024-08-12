@@ -16,6 +16,18 @@ public class CubeSceneManager : ExpSceneManager
     private const float VERTICAL_CENTER_OFFSET = -10.0f;
     private GameObject _target;
     private GameObject _goal;
+    private Vector3 _goalOffset;
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if(_isInTrial)
+        {
+            _goalOffset = _goal.transform.position - _target.transform.position;
+            Debug.Log("Logger: goal offset: "+_goalOffset.x.ToString()+_goalOffset.y.ToString()+_goalOffset.z.ToString());
+        }
+    }
 
     public override void StartTrial()
     {
@@ -43,6 +55,11 @@ public class CubeSceneManager : ExpSceneManager
             return;
         }
         LoadNewScene();
+    }
+
+    public Vector3 GetGoalPosition()
+    {
+        return _goal.transform.position;
     }
 
     protected override void GenerateTargets()

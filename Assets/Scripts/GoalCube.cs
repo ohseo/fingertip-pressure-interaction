@@ -24,6 +24,7 @@ public class GoalCube : MonoBehaviour
         {
             targetSphere.GoalIn();
         }
+        Debug.Log("Logger: target goal in");
     }
 
     void OnTriggerExit(Collider collider)
@@ -37,5 +38,6 @@ public class GoalCube : MonoBehaviour
                 targetSphere.GoalOut();
             // }
         }
+        Debug.Log("Logger: target goal out");
     }
 }

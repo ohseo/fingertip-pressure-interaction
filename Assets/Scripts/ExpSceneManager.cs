@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using Oculus.Platform;
 using Oculus.Platform.Models;
 using OculusSampleFramework;
@@ -34,6 +35,8 @@ public class ExpSceneManager : MonoBehaviour
     [HideInInspector]
     public bool _isInSet = false;
     protected TextMeshProUGUI _text;
+    protected UnityEvent _startTrialEvent = new UnityEvent();
+    protected UnityEvent<float, bool> _endTrialEvent = new UnityEvent<float, bool>();
 
     // Start is called before the first frame update
     void Start()
@@ -110,7 +113,7 @@ public class ExpSceneManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if(_isInTrial)
         {
@@ -165,5 +168,15 @@ public class ExpSceneManager : MonoBehaviour
     protected void EndScene()
     {
 
+    }
+
+    public void RegisterForStartEvent(UnityAction action)
+    {
+        _startTrialEvent.AddListener(action);
+    }
+
+    public void RegisterForEndEvent(UnityAction<float, bool> action)
+    {
+        _endTrialEvent.AddListener(action);
     }
 }
