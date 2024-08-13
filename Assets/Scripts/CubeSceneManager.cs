@@ -42,7 +42,7 @@ public class CubeSceneManager : ExpSceneManager
         _trialDuration = 0f;
         _isTimeout = false;
         _isInTrial = true;
-        _startTrialTrigger.Invoke(_trialDuration, _currentSet, _currentTrial);
+        _startTrialTrigger.Invoke(_currentSet, _currentTrial, 0, _goal.transform.position);
     }
 
     public override void EndTrial()

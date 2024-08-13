@@ -35,7 +35,7 @@ public class ExpSceneManager : MonoBehaviour
     [HideInInspector]
     public bool _isInSet = false;
     protected TextMeshProUGUI _text;
-    protected UnityAction<float, int, int> _startTrialTrigger;
+    protected UnityAction<int, int, int, Vector3> _startTrialTrigger;
     protected UnityAction<float, string> _endTrialTrigger;
 
     // Start is called before the first frame update
@@ -175,7 +175,7 @@ public class ExpSceneManager : MonoBehaviour
         return _trialDuration;
     }
 
-    public void RegisterForStartEvent(UnityAction<float, int, int> action)
+    public void RegisterForStartEvent(UnityAction<int, int, int, Vector3> action)
     {
         _startTrialTrigger += action;
     }

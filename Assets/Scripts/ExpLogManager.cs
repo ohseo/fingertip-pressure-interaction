@@ -14,9 +14,9 @@ public class ExpLogManager : MonoBehaviour
     private string fileName;
     private FileStream _fsWrite;
     private StreamWriter _streamWriter;
-    private string[] _eventLogHeaderTask1 = new string[15]{"Set Number", "Trial Number", "Event Name", "Time Stamp", "Trial Duration", "Input State",
+    private string[] _eventLogHeaderTask1 = new string[16]{"Set Number", "Trial Number", "Event Name", "Time Stamp", "Trial Duration", "Input State",
                                                     "Hit Index", "Target x", "Target y", "Target z",
-                                                    "Is Exp Target", "Hit Point x", "Hit Point y", "Hit Point z", "Is Timeout"};
+                                                    "Is Exp Target", "Hit Offset x", "Hit Offset y", "Hit Offset z", "Hit Offset mag", "Is Timeout"};
     private int _setNum;
     private int _trialNum;
     private long _timeStamp;
@@ -25,10 +25,13 @@ public class ExpLogManager : MonoBehaviour
     private string _hitIndex;
     private Vector3 _targetPosition;
     private string _isExpTarget;
-    private Vector3 _hitPoint;
+    private Vector3 _hitOffset;
     private string _isTimeout;
     private delegate string GenerateStringArrayDelegate(string str);
     private GenerateStringArrayDelegate _genStr;
+
+    private Vector3 _expTargetPosition;
+    private int _expTargetIndex;
 
     // Start is called before the first frame update
     void Start()
@@ -64,14 +67,14 @@ public class ExpLogManager : MonoBehaviour
         _hitIndex = "";
         _targetPosition = Vector3.zero;
         _isExpTarget = "";
-        _hitPoint = Vector3.zero;
+        _hitOffset = Vector3.zero;
         _isTimeout = "";
     }
 
     public void SetExpSceneManager(ExpSceneManager esm)
     {
         _expSceneManager = esm;
-        _expSceneManager.RegisterForStartEvent(new UnityAction<float, int, int>(OnTrialStart));
+        _expSceneManager.RegisterForStartEvent(new UnityAction<int, int, int, Vector3>(OnTrialStart));
         _expSceneManager.RegisterForEndEvent(new UnityAction<float, string>(OnTrialEnd));
         if(_taskNum == 1)
         {
@@ -85,8 +88,8 @@ public class ExpLogManager : MonoBehaviour
 
     public void SetRaycastingTool(RaycastingTool tool)
     {
-        tool.RegisterForTargetChangeEvent(new UnityAction<float, string, Vector3, string>(OnTargetChange));
-        tool.RegisterForSelectionEvent(new UnityAction<float, string, string, Vector3>(OnSelection));
+        tool.RegisterForTargetChangeEvent(new UnityAction<float, string, Vector3[], string>(OnTargetChange));
+        tool.RegisterForSelectionEvent(new UnityAction<float, string, Vector3[], string>(OnSelection));
         tool.RegisterForGrabEvent(new UnityAction<float, string, Vector3>(OnGrab));
         tool.RegisterForReleaseEvent(new UnityAction<float, string, Vector3>(OnRelease));
         tool.RegisterForInputStateChangeEvent(new UnityAction<float, string, string>(OnInputStateChange));
@@ -103,12 +106,14 @@ public class ExpLogManager : MonoBehaviour
         _streamWriter.WriteLine(header);
     }
 
-    public void OnTrialStart(float trialDuration, int currSet, int currTrial)
+    public void OnTrialStart(int currSet, int currTrial, int targetIndex, Vector3 targetPos)
     {
         ResetValues();
-        _trialDuration = trialDuration;
         _setNum = currSet;
         _trialNum = currTrial;
+        _hitIndex = targetIndex.ToString();
+        _targetPosition = targetPos;
+        _expTargetPosition = targetPos;
         _streamWriter.WriteLine(_genStr("Trial Start"));
     }
 
@@ -118,7 +123,7 @@ public class ExpLogManager : MonoBehaviour
         _trialDuration = trialDuration;
         _isTimeout = isTimeOut;
         _streamWriter.WriteLine(_genStr("Trial End"));
-        // ResetValues();
+        _expTargetPosition = Vector3.zero;
     }
     
     public void OnInputStateChange(float trialDuration, string prevstate, string currstate)
@@ -142,24 +147,26 @@ public class ExpLogManager : MonoBehaviour
         Debug.Log("Logger: target goal out");
     }
 
-    public void OnTargetChange(float trialDuration, string tg, Vector3 tgpos, string b)
+    public void OnTargetChange(float trialDuration, string tg, Vector3[] v, string b)
     {
         ResetValues();
         _trialDuration = trialDuration;
         _hitIndex = tg;
-        _targetPosition = tgpos;
+        _targetPosition = v[0];
+        _hitOffset = tg == "null" ? Vector3.zero : v[1] - _expTargetPosition;
         _isExpTarget = b;
         _streamWriter.WriteLine(_genStr("Target Change"));
         // Debug.Log("Logger: target change occurred: "+prevtg+" to "+tg);
     }
 
-    public void OnSelection(float trialDuration, string objstr, string b, Vector3 hitPoint)
+    public void OnSelection(float trialDuration, string objstr, Vector3[] v, string b)
     {
         ResetValues();
         _trialDuration = trialDuration;
         _hitIndex = objstr;
         _isExpTarget = b;
-        _hitPoint = hitPoint;
+        _targetPosition = v[0];
+        _hitOffset = objstr == "null" ? Vector3.zero : v[1] - _expTargetPosition;
         _streamWriter.WriteLine(_genStr("Selection"));
         // Debug.Log("Logger: object selected: "+objstr);
     }
@@ -192,9 +199,10 @@ public class ExpLogManager : MonoBehaviour
         values.Add(_targetPosition.y.ToString());
         values.Add(_targetPosition.z.ToString());
         values.Add(_isExpTarget.ToString());
-        values.Add(_hitPoint.x.ToString());
-        values.Add(_hitPoint.y.ToString());
-        values.Add(_hitPoint.z.ToString());
+        values.Add(_hitOffset.x.ToString());
+        values.Add(_hitOffset.y.ToString());
+        values.Add(_hitOffset.z.ToString());
+        values.Add(_hitOffset.magnitude.ToString());
         values.Add(_isTimeout.ToString());
 
         return String.Join(",", values.ToArray());

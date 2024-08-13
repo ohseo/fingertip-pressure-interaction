@@ -22,6 +22,7 @@ public class SelectionSceneManager : ExpSceneManager
     private List<GameObject> _targets = new List<GameObject>();
     private List<GameObject> _internalTargets = new List<GameObject>();
     private int _expTargetIndex;
+    private GameObject _expTarget;
     private int _expTargetCount = 0;
 
     public override void StartTrial()
@@ -32,7 +33,7 @@ public class SelectionSceneManager : ExpSceneManager
         _isTimeout = false;
         _isInTrial = true;
         _expTargetCount = 0;
-        _startTrialTrigger.Invoke(_trialDuration, _currentSet, _currentTrial);
+        _startTrialTrigger.Invoke(_currentSet, _currentTrial, _expTargetIndex, _expTarget.transform.position);
     }
 
     public override void EndTrial()
@@ -126,8 +127,8 @@ public class SelectionSceneManager : ExpSceneManager
 
         int r = Random.Range(0, _internalTargets.Count-1);
         _internalTargets[r].GetComponent<TargetSphere>().MakeExpTarget();
-        // _internalTargets[r].GetComponent<TargetSphere>().IsExpTarget = true;
-        _expTargetIndex = r;
+        _expTargetIndex = _targets.FindIndex(x => GameObject.ReferenceEquals(x, _internalTargets[r]));
+        _expTarget = _targets[_expTargetIndex];
         _expTargetCount++;
     }
 }
