@@ -35,8 +35,8 @@ public class ExpSceneManager : MonoBehaviour
     [HideInInspector]
     public bool _isInSet = false;
     protected TextMeshProUGUI _text;
-    protected UnityEvent _startTrialEvent = new UnityEvent();
-    protected UnityEvent<float, bool> _endTrialEvent = new UnityEvent<float, bool>();
+    protected UnityAction<float, int, int> _startTrialTrigger;
+    protected UnityAction<float, string> _endTrialTrigger;
 
     // Start is called before the first frame update
     void Start()
@@ -170,13 +170,18 @@ public class ExpSceneManager : MonoBehaviour
 
     }
 
-    public void RegisterForStartEvent(UnityAction action)
+    public float GetTrialDuration()
     {
-        _startTrialEvent.AddListener(action);
+        return _trialDuration;
     }
 
-    public void RegisterForEndEvent(UnityAction<float, bool> action)
+    public void RegisterForStartEvent(UnityAction<float, int, int> action)
     {
-        _endTrialEvent.AddListener(action);
+        _startTrialTrigger += action;
+    }
+
+    public void RegisterForEndEvent(UnityAction<float, string> action)
+    {
+        _endTrialTrigger += action;
     }
 }

@@ -11,7 +11,7 @@ public class ExpManager : MonoBehaviour
     public int _targetDepthCondition = 1; //1: 1.0f, 2: 2.0f
     public int _targetDensityCondition = 1; //1: sparse, 2: dense
     public bool _isRightHanded = true;
-    public RaycastingTool _baselineRaycastingTool = null;
+    public BaselineRaycastingTool _baselineRaycastingTool = null;
     public RayModifyingTool _rayModifyingTool = null;
     public ForceLevelManager _forceLevelManager = null;
     [HideInInspector] public ExpSceneManager _expSceneManager = null;
@@ -28,15 +28,6 @@ public class ExpManager : MonoBehaviour
 
     void Awake()
     {
-        if(_raycastingMode == 0)
-        {
-            StartCoroutine(AttachToolToHand(_baselineRaycastingTool, _isRightHanded));
-        } else
-        {
-            StartCoroutine(AttachToolToHand(_rayModifyingTool, _isRightHanded));
-            _rayModifyingTool._raycastingMode = _raycastingMode;
-        }
-
         GameObject sceneGO = new GameObject("ExpSceneManager");
 
         if(_taskNum == 1)
@@ -59,7 +50,18 @@ public class ExpManager : MonoBehaviour
 
         GameObject logGO = new GameObject("ExpLogManager");
         _expLogManager = logGO.AddComponent<ExpLogManager>();
+        _expLogManager._taskNum = _taskNum;
         _expLogManager.SetExpSceneManager(_expSceneManager);
+        _expLogManager.Init();
+
+        if(_raycastingMode == 0)
+        {
+            StartCoroutine(AttachToolToHand(_baselineRaycastingTool, _isRightHanded));
+        } else
+        {
+            StartCoroutine(AttachToolToHand(_rayModifyingTool, _isRightHanded));
+            _rayModifyingTool._raycastingMode = _raycastingMode;
+        }
     }
     // Start is called before the first frame update
     void Start()
@@ -90,5 +92,6 @@ public class ExpManager : MonoBehaviour
         obj.SetExpManager(this);
         obj.SetExpSceneManager(_expSceneManager);
         obj.SetHand(_hand);
+        _expLogManager.SetRaycastingTool(obj);
     }
 }

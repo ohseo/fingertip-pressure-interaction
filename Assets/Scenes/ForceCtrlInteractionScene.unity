@@ -651,7 +651,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _participantNum: 0
-  _taskNum: 2
+  _taskNum: 1
   _raycastingMode: 0
   _targetDepthCondition: 1
   _targetDensityCondition: 2

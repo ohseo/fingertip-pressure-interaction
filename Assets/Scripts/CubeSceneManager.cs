@@ -7,6 +7,7 @@ using Oculus.Platform.Models;
 using OculusSampleFramework;
 using System;
 using Random=UnityEngine.Random;
+using UnityEngine.Events;
 
 
 public class CubeSceneManager : ExpSceneManager
@@ -17,6 +18,10 @@ public class CubeSceneManager : ExpSceneManager
     private GameObject _target;
     private GameObject _goal;
     private Vector3 _goalOffset;
+    protected UnityAction _goalInPreTrigger;
+    protected UnityAction _goalOutPreTrigger;
+    protected UnityAction<float> _goalInTrigger;
+    protected UnityAction<float> _goalOutTrigger;
 
     protected override void Update()
     {
@@ -25,7 +30,7 @@ public class CubeSceneManager : ExpSceneManager
         if(_isInTrial)
         {
             _goalOffset = _goal.transform.position - _target.transform.position;
-            Debug.Log("Logger: goal offset: "+_goalOffset.x.ToString()+_goalOffset.y.ToString()+_goalOffset.z.ToString());
+            // Debug.Log("Logger: goal offset: "+_goalOffset.x.ToString()+_goalOffset.y.ToString()+_goalOffset.z.ToString());
         }
     }
 
@@ -37,10 +42,12 @@ public class CubeSceneManager : ExpSceneManager
         _trialDuration = 0f;
         _isTimeout = false;
         _isInTrial = true;
+        _startTrialTrigger.Invoke(_trialDuration, _currentSet, _currentTrial);
     }
 
     public override void EndTrial()
     {
+        _endTrialTrigger.Invoke(_trialDuration, _isTimeout.ToString());
         Destroy(_target.gameObject);
         Destroy(_goal.gameObject);
         _target = null;
@@ -60,6 +67,11 @@ public class CubeSceneManager : ExpSceneManager
     public Vector3 GetGoalPosition()
     {
         return _goal.transform.position;
+    }
+
+    public Vector3 GetGoalOffset()
+    {
+        return _goalOffset;
     }
 
     protected override void GenerateTargets()
@@ -89,5 +101,28 @@ public class CubeSceneManager : ExpSceneManager
         GameObject cube = Instantiate(goalCubePrefab, pos, Quaternion.identity);
         cube.transform.localScale *= TARGET_SIZE;
         _goal = cube;
+        _goalInPreTrigger = new UnityAction(OnGoalIn);
+        _goalOutPreTrigger = new UnityAction(OnGoalOut);
+        _goal.GetComponent<GoalCube>().TriggerEnter += _goalInPreTrigger;
+        _goal.GetComponent<GoalCube>().TriggerExit += _goalOutPreTrigger;
+    }
+
+    public void OnGoalIn()
+    {
+        _goalInTrigger.Invoke(_trialDuration);
+    }
+
+    public void OnGoalOut()
+    {
+        _goalOutTrigger.Invoke(_trialDuration);
+    }
+
+    public void RegisterForGoalInEvent(UnityAction<float> action)
+    {
+        _goalInTrigger += action;
+    }
+    public void RegisterForGoalOutEvent(UnityAction<float> action)
+    {
+        _goalOutTrigger += action;
     }
 }

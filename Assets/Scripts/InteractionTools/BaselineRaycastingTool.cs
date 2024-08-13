@@ -33,7 +33,8 @@ public class BaselineRaycastingTool : RaycastingTool
         {
             if(_prevRayState != RayInputState)
             {
-                Debug.Log("Logger: ray state changed: from "+_prevRayState.ToString()+" to "+RayInputState.ToString());
+                _inputStateChangeTrigger.Invoke(_expSceneManager.GetTrialDuration(), _prevRayState.ToString(), RayInputState.ToString());
+                // Debug.Log("Logger: ray state changed: from "+_prevRayState.ToString()+" to "+RayInputState.ToString());
             }
         }
         _prevRayState = RayInputState;

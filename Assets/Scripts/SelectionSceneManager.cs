@@ -32,12 +32,12 @@ public class SelectionSceneManager : ExpSceneManager
         _isTimeout = false;
         _isInTrial = true;
         _expTargetCount = 0;
-        _startTrialEvent.Invoke();
+        _startTrialTrigger.Invoke(_trialDuration, _currentSet, _currentTrial);
     }
 
     public override void EndTrial()
     {
-        _endTrialEvent.Invoke(_trialDuration, _isTimeout);
+        _endTrialTrigger.Invoke(_trialDuration, _isTimeout.ToString());
         foreach(GameObject target in _targets)
         {
             Destroy(target);

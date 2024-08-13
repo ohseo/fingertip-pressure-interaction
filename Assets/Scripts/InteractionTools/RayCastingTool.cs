@@ -6,6 +6,7 @@ using TMPro;
 using OculusSampleFramework;
 using UnityEditor;
 using Oculus.Interaction;
+using UnityEngine.Events;
 
 public class RaycastingTool : MonoBehaviour
 {
@@ -58,8 +59,15 @@ public class RaycastingTool : MonoBehaviour
     protected TargetSphere _prevGrabbedObj = null;
     protected Vector3 _grabbedObjPosOff;
     protected Vector3 _goalOffset;
+    protected Vector3 _hitPoint;
 
     protected Action<bool, bool> interactionCheckDelegate;
+
+    protected UnityAction<float, string, Vector3, string> _targetChangeTrigger;
+    protected UnityAction<float, string, string, Vector3> _selectionTrigger;
+    protected UnityAction<float, string, Vector3> _grabTrigger;
+    protected UnityAction<float, string, Vector3> _releaseTrigger; 
+    protected UnityAction<float, string, string> _inputStateChangeTrigger;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -120,6 +128,7 @@ public class RaycastingTool : MonoBehaviour
             {
                 targetHit = currTarget;
                 minHitDistance = distanceToTarget;
+                _hitPoint = hit.point;
             }
         }
 
@@ -152,7 +161,7 @@ public class RaycastingTool : MonoBehaviour
                     sphere.Mute();  
                 // }
             }
-            // _text.text = "Null";
+            _hitPoint = Vector3.zero;
         }
 
         if(targetHit != _prevTargetHit)
@@ -160,9 +169,11 @@ public class RaycastingTool : MonoBehaviour
             //Invoke
             if(_expSceneManager._isInTrial)
             {
-                string tgstr = targetHit == null ? "null" : targetHit.targetIndex.ToString();
                 string prevtgstr = _prevTargetHit == null ? "null" : _prevTargetHit.targetIndex.ToString();
-                Debug.Log("Logger: target change occurred: "+prevtgstr+" to "+tgstr);
+                string tgstr = targetHit == null ? "null" : targetHit.targetIndex.ToString();
+                Vector3 pos = targetHit == null ? Vector3.zero : targetHit.transform.position;
+                string b = targetHit == null ? "" : targetHit.IsExpTarget.ToString();
+                _targetChangeTrigger.Invoke(_expSceneManager.GetTrialDuration(), tgstr, pos, b);
             }
         }
         
@@ -205,7 +216,8 @@ public class RaycastingTool : MonoBehaviour
         if(_expSceneManager._isInTrial)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
-            Debug.Log("Logger: object selected: "+objstr);
+            string b = _grabbedObj == null ? "" : _grabbedObj.IsExpTarget.ToString();
+            _selectionTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, b, _hitPoint);
         }
 
         if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
@@ -250,7 +262,8 @@ public class RaycastingTool : MonoBehaviour
         if(_expSceneManager._isInTrial)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
-            Debug.Log("Logger: object grabbed: "+objstr);
+            Vector3 offset = ((CubeSceneManager)_expSceneManager).GetGoalOffset();
+            _grabTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, offset);
         }
 
         if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
@@ -279,7 +292,8 @@ public class RaycastingTool : MonoBehaviour
         if(_expSceneManager._isInTrial)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
-            Debug.Log("Logger: object released: "+objstr);
+            Vector3 offset = ((CubeSceneManager)_expSceneManager).GetGoalOffset();
+            _releaseTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, offset);
         }
 
         if(_grabbedObj != null)
@@ -339,5 +353,30 @@ public class RaycastingTool : MonoBehaviour
             interactionCheckDelegate = CheckForGrabOrRelease;
             _forceStateModule.SetTaskNum(mode);
         }  
+    }
+
+    public void RegisterForTargetChangeEvent(UnityAction<float, string, Vector3, string> action)
+    {
+        _targetChangeTrigger += action;
+    }
+
+    public void RegisterForSelectionEvent(UnityAction<float, string, string, Vector3> action)
+    {
+        _selectionTrigger += action;
+    }
+
+    public void RegisterForGrabEvent(UnityAction<float, string, Vector3> action)
+    {
+        _grabTrigger += action;
+    }
+
+    public void RegisterForReleaseEvent(UnityAction<float, string, Vector3> action)
+    {
+        _releaseTrigger += action;
+    }
+
+    public void RegisterForInputStateChangeEvent(UnityAction<float, string, string> action)
+    {
+        _inputStateChangeTrigger += action;
     }
 }

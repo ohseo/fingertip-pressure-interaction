@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GoalCube : MonoBehaviour
 {
     private const float OVERLAP_THRESHOLD = 0.01f;
+    public UnityAction TriggerEnter;
+    public UnityAction TriggerExit;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,27 +21,23 @@ public class GoalCube : MonoBehaviour
         
     }
 
-    void OnTriggerEnter(Collider collider)
+    public void OnTriggerEnter(Collider collider)
     {
         TargetSphere targetSphere = collider.gameObject.GetComponent<TargetSphere>();
         if(targetSphere != null)
         {
             targetSphere.GoalIn();
         }
-        Debug.Log("Logger: target goal in");
+        TriggerEnter.Invoke();
     }
 
-    void OnTriggerExit(Collider collider)
+    public void OnTriggerExit(Collider collider)
     {
         TargetSphere targetSphere = collider.gameObject.GetComponent<TargetSphere>();
         if(targetSphere != null)
         {
-            // bool overlap = Mathf.Abs((transform.position - targetSphere.transform.position).magnitude) < OVERLAP_THRESHOLD;
-            // if(!overlap)
-            // {
-                targetSphere.GoalOut();
-            // }
+            targetSphere.GoalOut();
         }
-        Debug.Log("Logger: target goal out");
+        TriggerExit.Invoke();
     }
 }
