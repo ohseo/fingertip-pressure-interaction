@@ -9,7 +9,6 @@ public class ExpManager : MonoBehaviour
     public int _taskNum = 1;
     public int _raycastingMode = 0; //0: Baseline, 1: CDHand, 2: CDDirection, 3: ForceCtrl
     public int _targetDepthCondition = 1; //1: 1.0f, 2: 2.0f
-    public int _targetDensityCondition = 1; //1: sparse, 2: dense
     public bool _isRightHanded = true;
     public BaselineRaycastingTool _baselineRaycastingTool = null;
     public RayModifyingTool _rayModifyingTool = null;
@@ -41,7 +40,7 @@ public class ExpManager : MonoBehaviour
         }
 
         _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
-        _expSceneManager.SetExpConditions(_targetDepthCondition, _targetDensityCondition);
+        _expSceneManager.SetExpConditions(_targetDepthCondition);
         if(_forceSetAndTrial)
         {
             _expSceneManager.ForceSetAndTrial(_forceSetAndTrial, _forceSetNum, _forceTrialNum);
@@ -50,9 +49,14 @@ public class ExpManager : MonoBehaviour
 
         GameObject logGO = new GameObject("ExpLogManager");
         _expLogManager = logGO.AddComponent<ExpLogManager>();
-        _expLogManager._taskNum = _taskNum;
+        _expLogManager.SetExpConditions(_participantNum, _taskNum, _raycastingMode, _targetDepthCondition);
         _expLogManager.SetExpSceneManager(_expSceneManager);
         _expLogManager.Init();
+
+        if(_taskNum == 1)
+        {
+            ((SelectionSceneManager)_expSceneManager).SetFilePath(_expLogManager.CreateFilePath());
+        }
 
         if(_raycastingMode == 0)
         {

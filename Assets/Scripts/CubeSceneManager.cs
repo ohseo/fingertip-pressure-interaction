@@ -20,8 +20,8 @@ public class CubeSceneManager : ExpSceneManager
     private Vector3 _goalOffset;
     protected UnityAction _goalInPreTrigger;
     protected UnityAction _goalOutPreTrigger;
-    protected UnityAction<float> _goalInTrigger;
-    protected UnityAction<float> _goalOutTrigger;
+    protected UnityAction<float, Vector3, Vector3> _goalInTrigger;
+    protected UnityAction<float, Vector3, Vector3> _goalOutTrigger;
 
     protected override void Update()
     {
@@ -29,7 +29,7 @@ public class CubeSceneManager : ExpSceneManager
 
         if(_isInTrial)
         {
-            _goalOffset = _goal.transform.position - _target.transform.position;
+            _goalOffset = _target.transform.position - _goal.transform.position;
             // Debug.Log("Logger: goal offset: "+_goalOffset.x.ToString()+_goalOffset.y.ToString()+_goalOffset.z.ToString());
         }
     }
@@ -42,12 +42,14 @@ public class CubeSceneManager : ExpSceneManager
         _trialDuration = 0f;
         _isTimeout = false;
         _isInTrial = true;
-        _startTrialTrigger.Invoke(_currentSet, _currentTrial, 0, _goal.transform.position);
+        Vector3[] v = {_target.transform.position, _goal.transform.position};
+        int i = _target.GetComponent<TargetSphere>().targetIndex;
+        _startTrialTrigger.Invoke(_currentSet, _currentTrial, i, v);
     }
 
     public override void EndTrial()
     {
-        _endTrialTrigger.Invoke(_trialDuration, _isTimeout.ToString());
+        _endTrialTrigger.Invoke(_trialDuration, _isTimeout.ToString(), _goalOffset);
         Destroy(_target.gameObject);
         Destroy(_goal.gameObject);
         _target = null;
@@ -57,7 +59,7 @@ public class CubeSceneManager : ExpSceneManager
         _isInTrial = false;
         if(_currentTrial > MAX_TRIAL_NUM)
         {
-            _text.text = "Set Finished";
+            _text.text = "Set Completed";
             EndSet();
             return;
         }
@@ -72,6 +74,11 @@ public class CubeSceneManager : ExpSceneManager
     public Vector3 GetGoalOffset()
     {
         return _goalOffset;
+    }
+
+    public Vector3 GetTargetPosition()
+    {
+        return _target.transform.position;
     }
 
     protected override void GenerateTargets()
@@ -109,19 +116,19 @@ public class CubeSceneManager : ExpSceneManager
 
     public void OnGoalIn()
     {
-        _goalInTrigger.Invoke(_trialDuration);
+        _goalInTrigger.Invoke(_trialDuration, _target.transform.position, _goalOffset);
     }
 
     public void OnGoalOut()
     {
-        _goalOutTrigger.Invoke(_trialDuration);
+        _goalOutTrigger.Invoke(_trialDuration, _target.transform.position, _goalOffset);
     }
 
-    public void RegisterForGoalInEvent(UnityAction<float> action)
+    public void RegisterForGoalInEvent(UnityAction<float, Vector3, Vector3> action)
     {
         _goalInTrigger += action;
     }
-    public void RegisterForGoalOutEvent(UnityAction<float> action)
+    public void RegisterForGoalOutEvent(UnityAction<float, Vector3, Vector3> action)
     {
         _goalOutTrigger += action;
     }

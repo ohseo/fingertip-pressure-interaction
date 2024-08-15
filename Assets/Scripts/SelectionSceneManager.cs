@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using Oculus.Platform;
@@ -24,21 +25,31 @@ public class SelectionSceneManager : ExpSceneManager
     private int _expTargetIndex;
     private GameObject _expTarget;
     private int _expTargetCount = 0;
+    private FileStream _sceneFSWrite;
+    private StreamWriter _sceneWriter;
+    private string filePath;
+
+    public void SetFilePath(string path)
+    {
+        filePath = path;
+    }
 
     public override void StartTrial()
     {
         DestroyCenter();
         GenerateTargets();
+        LogScene();
         _trialDuration = 0f;
         _isTimeout = false;
         _isInTrial = true;
         _expTargetCount = 0;
-        _startTrialTrigger.Invoke(_currentSet, _currentTrial, _expTargetIndex, _expTarget.transform.position);
+        Vector3[] v = {_expTarget.transform.position, Vector3.zero};
+        _startTrialTrigger.Invoke(_currentSet, _currentTrial, _expTargetIndex, v);
     }
 
     public override void EndTrial()
     {
-        _endTrialTrigger.Invoke(_trialDuration, _isTimeout.ToString());
+        _endTrialTrigger.Invoke(_trialDuration, _isTimeout.ToString(), Vector3.zero);
         foreach(GameObject target in _targets)
         {
             Destroy(target);
@@ -51,7 +62,7 @@ public class SelectionSceneManager : ExpSceneManager
         _currentTrial++;
         if(_currentTrial > MAX_TRIAL_NUM)
         {
-            _text.text = "Set Finished";
+            _text.text = "Set Completed";
             EndSet();
             return;
         }
@@ -130,5 +141,29 @@ public class SelectionSceneManager : ExpSceneManager
         _expTargetIndex = _targets.FindIndex(x => GameObject.ReferenceEquals(x, _internalTargets[r]));
         _expTarget = _targets[_expTargetIndex];
         _expTargetCount++;
+    }
+
+    private void LogScene()
+    {
+        string sceneFullPath = filePath+$"_Set{_currentSet}_Trial{_currentTrial}_SceneData.csv";
+        _sceneFSWrite = new FileStream(sceneFullPath, FileMode.Create, FileAccess.Write);
+        _sceneWriter = new StreamWriter(_sceneFSWrite, System.Text.Encoding.UTF8);
+        _sceneWriter.WriteLine("Target Index, Target x, Target y, Target z, Is Exp Target");
+        
+        for (int i=0; i<_targets.Count; i++)
+        {
+            List<string> values = new List<string>();
+
+            values.Add(i.ToString());
+            values.Add(_targets[i].transform.position.x.ToString());
+            values.Add(_targets[i].transform.position.y.ToString());
+            values.Add(_targets[i].transform.position.z.ToString());
+            values.Add(_targets[i].GetComponent<TargetSphere>().IsExpTarget.ToString());
+
+            _sceneWriter.WriteLine(String.Join(",", values.ToArray()));
+        }
+
+        _sceneWriter.Close();
+        _sceneFSWrite.Close();
     }
 }

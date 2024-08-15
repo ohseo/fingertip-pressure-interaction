@@ -654,7 +654,6 @@ MonoBehaviour:
   _taskNum: 1
   _raycastingMode: 0
   _targetDepthCondition: 1
-  _targetDensityCondition: 2
   _isRightHanded: 1
   _baselineRaycastingTool: {fileID: 6575072930710463596, guid: 2f0a1cf37f913f042aeadb98a23b68e8,
     type: 3}

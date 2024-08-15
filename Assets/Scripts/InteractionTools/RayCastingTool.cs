@@ -65,8 +65,8 @@ public class RaycastingTool : MonoBehaviour
 
     protected UnityAction<float, string, Vector3[], string> _targetChangeTrigger;
     protected UnityAction<float, string, Vector3[], string> _selectionTrigger;
-    protected UnityAction<float, string, Vector3> _grabTrigger;
-    protected UnityAction<float, string, Vector3> _releaseTrigger; 
+    protected UnityAction<float, string, Vector3[], string> _grabTrigger;
+    protected UnityAction<float, string, Vector3[], string> _releaseTrigger; 
     protected UnityAction<float, string, string> _inputStateChangeTrigger;
 
     // Start is called before the first frame update
@@ -172,7 +172,7 @@ public class RaycastingTool : MonoBehaviour
                 string tgstr = targetHit == null ? "null" : targetHit.targetIndex.ToString();
                 Vector3 pos = targetHit == null ? Vector3.zero : targetHit.transform.position;
                 Vector3[] v = {pos, _hitPoint};
-                string b = targetHit == null ? "FALSE" : targetHit.IsExpTarget.ToString();
+                string b = targetHit == null ? false.ToString() : targetHit.IsExpTarget.ToString();
                 _targetChangeTrigger.Invoke(_expSceneManager.GetTrialDuration(), tgstr, v, b);
             }
         }
@@ -218,7 +218,7 @@ public class RaycastingTool : MonoBehaviour
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
             Vector3 pos = _grabbedObj == null ? Vector3.zero : _grabbedObj.transform.position;
             Vector3[] v = {pos, _hitPoint};
-            string b = _grabbedObj == null ? "FALSE" : _grabbedObj.IsExpTarget.ToString();
+            string b = _grabbedObj == null ? false.ToString() : _grabbedObj.IsExpTarget.ToString();
             _selectionTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, v, b);
         }
 
@@ -264,8 +264,9 @@ public class RaycastingTool : MonoBehaviour
         if(_expSceneManager._isInTrial)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
-            Vector3 offset = ((CubeSceneManager)_expSceneManager).GetGoalOffset();
-            _grabTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, offset);
+            Vector3[] v = {((CubeSceneManager)_expSceneManager).GetTargetPosition(), ((CubeSceneManager)_expSceneManager).GetGoalOffset()};
+            string b = _grabbedObj == null ? "" : _grabbedObj.GetComponent<TargetSphere>().IsInGoal.ToString();
+            _grabTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, v, b);
         }
 
         if(_grabbedObj != null && _grabbedObj.IsStartingSphere)
@@ -294,8 +295,9 @@ public class RaycastingTool : MonoBehaviour
         if(_expSceneManager._isInTrial)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
-            Vector3 offset = ((CubeSceneManager)_expSceneManager).GetGoalOffset();
-            _releaseTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, offset);
+            Vector3[] v = {((CubeSceneManager)_expSceneManager).GetTargetPosition(), ((CubeSceneManager)_expSceneManager).GetGoalOffset()};
+            string b = _grabbedObj == null ? "" : _grabbedObj.GetComponent<TargetSphere>().IsInGoal.ToString();
+            _releaseTrigger.Invoke(_expSceneManager.GetTrialDuration(), objstr, v, b);
         }
 
         if(_grabbedObj != null)
@@ -367,12 +369,12 @@ public class RaycastingTool : MonoBehaviour
         _selectionTrigger += action;
     }
 
-    public void RegisterForGrabEvent(UnityAction<float, string, Vector3> action)
+    public void RegisterForGrabEvent(UnityAction<float, string, Vector3[], string> action)
     {
         _grabTrigger += action;
     }
 
-    public void RegisterForReleaseEvent(UnityAction<float, string, Vector3> action)
+    public void RegisterForReleaseEvent(UnityAction<float, string, Vector3[], string> action)
     {
         _releaseTrigger += action;
     }

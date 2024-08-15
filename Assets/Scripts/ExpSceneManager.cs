@@ -35,8 +35,8 @@ public class ExpSceneManager : MonoBehaviour
     [HideInInspector]
     public bool _isInSet = false;
     protected TextMeshProUGUI _text;
-    protected UnityAction<int, int, int, Vector3> _startTrialTrigger;
-    protected UnityAction<float, string> _endTrialTrigger;
+    protected UnityAction<int, int, int, Vector3[]> _startTrialTrigger;
+    protected UnityAction<float, string, Vector3> _endTrialTrigger;
 
     // Start is called before the first frame update
     void Start()
@@ -65,7 +65,7 @@ public class ExpSceneManager : MonoBehaviour
         goalCubePrefab = cube;
     }
 
-    public void SetExpConditions(int targetDepth, int targetDensity)
+    public void SetExpConditions(int targetDepth)
     {
         if(targetDepth == 1)
         {
@@ -73,14 +73,6 @@ public class ExpSceneManager : MonoBehaviour
         } else if(targetDepth == 2)
         {
             _targetDepth = 2.0f;
-        }
-
-        if(targetDensity == 1)
-        {
-            _numGrid = new Vector3(4, 4, 1);
-        } else if(targetDensity == 2)
-        {
-            _numGrid = new Vector3(6, 6, 1);
         }
     }
 
@@ -175,12 +167,12 @@ public class ExpSceneManager : MonoBehaviour
         return _trialDuration;
     }
 
-    public void RegisterForStartEvent(UnityAction<int, int, int, Vector3> action)
+    public void RegisterForStartEvent(UnityAction<int, int, int, Vector3[]> action)
     {
         _startTrialTrigger += action;
     }
 
-    public void RegisterForEndEvent(UnityAction<float, string> action)
+    public void RegisterForEndEvent(UnityAction<float, string, Vector3> action)
     {
         _endTrialTrigger += action;
     }
