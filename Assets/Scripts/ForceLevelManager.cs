@@ -15,10 +15,10 @@ public class ForceLevelManager : MonoBehaviour
     public int port = 5005;
     public TextMeshProUGUI udpTextMesh;
 
-    public string forceLevel { get; set; }
-    private string receivedForceLevel;
-    public int historyLength { get; set; }
-    public int[] historyCount { get; set; }
+    public string forceLevel { get; private set; }
+    public string receivedForceLevel { get; private set; }
+    public int historyLength { get; private set; }
+    public int[] historyCount { get; private set; }
 
     void Start()
     {

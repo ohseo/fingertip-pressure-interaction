@@ -16,7 +16,7 @@ public class ExpSceneManager : MonoBehaviour
     public int _expCondition = 0;
     protected float _targetDepth = 1.0f;
     protected const float TARGET_SIZE = 0.035f;
-    protected Vector3 _numGrid = new Vector3(6, 6, 1);
+    protected Vector3 _numGrid = new Vector3(7, 7, 1);
     public GameObject targetSpherePrefab;
     public GameObject goalCubePrefab;
     protected bool _forceSetAndTrial = false;

@@ -18,6 +18,7 @@ public class CubeSceneManager : ExpSceneManager
     private GameObject _target;
     private GameObject _goal;
     private Vector3 _goalOffset;
+    private bool _isInGoal = false;
     protected UnityAction _goalInPreTrigger;
     protected UnityAction _goalOutPreTrigger;
     protected UnityAction<float, Vector3, Vector3> _goalInTrigger;
@@ -42,6 +43,7 @@ public class CubeSceneManager : ExpSceneManager
         _trialDuration = 0f;
         _isTimeout = false;
         _isInTrial = true;
+        _isInGoal = false;
         Vector3[] v = {_target.transform.position, _goal.transform.position};
         int i = _target.GetComponent<TargetSphere>().targetIndex;
         _startTrialTrigger.Invoke(_currentSet, _currentTrial, i, v);
@@ -81,6 +83,11 @@ public class CubeSceneManager : ExpSceneManager
         return _target.transform.position;
     }
 
+    public string GetIsInGoal()
+    {
+        return _isInGoal.ToString();
+    }
+
     protected override void GenerateTargets()
     {
         if (_target != null)
@@ -117,11 +124,13 @@ public class CubeSceneManager : ExpSceneManager
     public void OnGoalIn()
     {
         _goalInTrigger.Invoke(_trialDuration, _target.transform.position, _goalOffset);
+        _isInGoal = true;
     }
 
     public void OnGoalOut()
     {
         _goalOutTrigger.Invoke(_trialDuration, _target.transform.position, _goalOffset);
+        _isInGoal = false;
     }
 
     public void RegisterForGoalInEvent(UnityAction<float, Vector3, Vector3> action)

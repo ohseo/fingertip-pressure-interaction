@@ -45,5 +45,7 @@ public class BaselineRaycastingTool : RaycastingTool
         {
             _rayVisualizer.SetRayLength(MAX_RAYCAST_DISTANCE);
         }
+
+        _ray = transform;
     }
 }

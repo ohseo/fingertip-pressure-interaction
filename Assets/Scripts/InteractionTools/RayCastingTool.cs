@@ -45,7 +45,9 @@ public class RaycastingTool : MonoBehaviour
     public bool IsRightHandedTool { get; set; }
     protected int _taskNumber { get; set; }
 
-    public OVRHand _hand { get; set; }
+    private OVRHand _hand;
+    protected Transform _ray;
+    private Transform _centerEyeAnchor;
     protected ForceStateModule _forceStateModule = new ForceStateModule();
     public TextMeshProUGUI _text;
 
@@ -60,6 +62,7 @@ public class RaycastingTool : MonoBehaviour
     protected Vector3 _grabbedObjPosOff;
     protected Vector3 _goalOffset;
     protected Vector3 _hitPoint;
+    protected string _hitIndexString, _hitIsExpString;
 
     protected Action<bool, bool> interactionCheckDelegate;
 
@@ -79,6 +82,12 @@ public class RaycastingTool : MonoBehaviour
         IsRightHandedTool = true;   // TODO: Connect to tool creator later
         _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
         // SetExpMode(_expManager._taskNum);
+
+        OVRCameraRig cameraRig = FindObjectOfType<OVRCameraRig>();
+        if(cameraRig != null)
+        {
+            _centerEyeAnchor = cameraRig.centerEyeAnchor;
+        }
     }
 
     // Update is called once per frame
@@ -174,6 +183,8 @@ public class RaycastingTool : MonoBehaviour
                 Vector3[] v = {pos, _hitPoint};
                 string b = targetHit == null ? false.ToString() : targetHit.IsExpTarget.ToString();
                 _targetChangeTrigger.Invoke(_expSceneManager.GetTrialDuration(), tgstr, v, b);
+                _hitIndexString = tgstr;
+                _hitIsExpString = b;
             }
         }
         
@@ -357,6 +368,76 @@ public class RaycastingTool : MonoBehaviour
             interactionCheckDelegate = CheckForGrabOrRelease;
             _forceStateModule.SetTaskNum(mode);
         }  
+    }
+
+    public Transform GetHeadPose()
+    {
+        return _centerEyeAnchor;
+    }
+
+    public Transform GetHandPose()
+    {
+        return _hand.transform;
+    }
+
+    public float GetPinchStrength()
+    {
+        return _hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
+    }
+
+    public Transform GetPointerPose()
+    {
+        return _hand.PointerPose;
+    }
+
+    public Transform GetRayPose()
+    {
+        return _ray;
+    }
+
+    public string[] GetForceLevels()
+    {
+        string[] s = new string[2]{_forceLevelManager.receivedForceLevel, _forceLevelManager.forceLevel};
+        return s;
+    }
+
+    public int[] GetForceHistory()
+    {
+        // int[] i = new int[4];
+        // i[0] = _forceLevelManager.historyLength;
+        // _forceLevelManager.historyCount.CopyTo(i, 1);
+        // return i;
+        return _forceLevelManager.historyCount;
+    }
+
+    public string GetForceState()
+    {
+        return _forceStateModule.currentForceState;
+    }
+
+    public virtual string GetInputState()
+    {
+        return RayInputState.ToString();
+    }
+
+    public string GetHitIndex()
+    {
+        return _hitIndexString;
+    }
+
+    public Vector3 GetHitPoint()
+    {
+        return _hitPoint;
+    }
+
+    public string GetHitIsExpTarget()
+    {
+        return _hitIsExpString;
+    }
+
+    public string GetIsGrabbed()
+    {
+        return (_grabbedObj != null).ToString();
     }
 
     public void RegisterForTargetChangeEvent(UnityAction<float, string, Vector3[], string> action)

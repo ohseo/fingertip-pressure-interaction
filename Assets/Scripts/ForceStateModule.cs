@@ -23,7 +23,7 @@ public class ForceStateModule
     
     private ForceState _currForceState;
     private ForceState _prevForceState;
-    private int _waitingCount { get; set; }
+    private int _waitingCount;
     private const int WAITING_THRESHOLD = 20;
     private int _taskNum = 1;
 

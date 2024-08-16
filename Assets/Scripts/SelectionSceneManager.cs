@@ -16,7 +16,7 @@ public class SelectionSceneManager : ExpSceneManager
     private const float VERTICAL_RANGE_M = 0.2f;
     private const float DEPTH_RANGE_M = 0.2f;
     private const float TARGET_POSITION_DEG = 0f;
-    private const float TARGET_GRID_MARGIN = 0.01f;
+    private const float TARGET_GRID_MARGIN = 0.005f;
     private const float VERTICAL_CENTER_OFFSET = 0.0f;
     private const float TARGET_DEPTH_MARGIN = 0.05f;
     private const int SEQUENCE_LENGTH = 1;

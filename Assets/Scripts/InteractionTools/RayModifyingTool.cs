@@ -107,6 +107,8 @@ public class RayModifyingTool : RaycastingTool
         {
             _rayVisualizer.SetRayLength(MAX_RAYCAST_DISTANCE);
         }
+
+        _ray = transform;
     }
 
     public void SetRayMode(int mode)
@@ -338,5 +340,10 @@ public class RayModifyingTool : RaycastingTool
             return true;
         }
         return false;
+    }
+
+    public override string GetInputState()
+    {
+        return RayInputState.ToString();
     }
 }
