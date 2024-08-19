@@ -161,7 +161,7 @@ public class ForceStateModule
                     {
                         if (forceLevel == "1")
                         {
-                            if(_taskNum == 1)
+                            if(_taskNum != 2)
                             {
                                 _currForceState = ForceState.SoftDown;
                             }
@@ -170,7 +170,7 @@ public class ForceStateModule
                             _currForceState = ForceState.HardDown;
                         } else if (forceLevel == "0")
                         {
-                            if(_taskNum == 2)
+                            if(_taskNum != 1)
                             {
                                 _currForceState = ForceState.NoneDown;
                             }

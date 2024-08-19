@@ -91,7 +91,7 @@ public class RayModifyingTool : RaycastingTool
         }
 
         _rayVisualizer.SetRayState(RayInputState);
-        if(_expSceneManager._isInTrial)
+        if(_expSceneManager._isInTrial && _expManager._taskNum != 0)
         {
             if(_prevRayState != RayInputState)
             {

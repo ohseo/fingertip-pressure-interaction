@@ -33,10 +33,14 @@ public class ExpManager : MonoBehaviour
         {
             SelectionSceneManager ssm = sceneGO.AddComponent<SelectionSceneManager>();
             _expSceneManager = (ExpSceneManager)ssm;
-        } else
+        } else if(_taskNum == 2)
         {
             CubeSceneManager csm = sceneGO.AddComponent<CubeSceneManager>();
             _expSceneManager = (ExpSceneManager)csm;
+        } else
+        {
+            PracticeSceneManager psm = sceneGO.AddComponent<PracticeSceneManager>();
+            _expSceneManager = (ExpSceneManager)psm;
         }
 
         _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
@@ -47,11 +51,14 @@ public class ExpManager : MonoBehaviour
         }
         _expSceneManager.Init();
 
-        GameObject logGO = new GameObject("ExpLogManager");
-        _expLogManager = logGO.AddComponent<ExpLogManager>();
-        _expLogManager.SetExpConditions(_participantNum, _taskNum, _raycastingMode, _targetDepthCondition);
-        _expLogManager.SetExpSceneManager(_expSceneManager);
-        _expLogManager.Init();
+        if(_taskNum != 0)
+        {
+            GameObject logGO = new GameObject("ExpLogManager");
+            _expLogManager = logGO.AddComponent<ExpLogManager>();
+            _expLogManager.SetExpConditions(_participantNum, _taskNum, _raycastingMode, _targetDepthCondition);
+            _expLogManager.SetExpSceneManager(_expSceneManager);
+            _expLogManager.Init();
+        }
 
         if(_taskNum == 1)
         {
@@ -96,6 +103,9 @@ public class ExpManager : MonoBehaviour
         obj.SetExpManager(this);
         obj.SetExpSceneManager(_expSceneManager);
         obj.SetHand(_hand);
-        _expLogManager.SetRaycastingTool(obj);
+        if(_taskNum != 0)
+        {
+            _expLogManager.SetRaycastingTool(obj);
+        }
     }
 }

@@ -176,7 +176,7 @@ public class RaycastingTool : MonoBehaviour
         if(targetHit != _prevTargetHit)
         {
             //Invoke
-            if(_expSceneManager._isInTrial)
+            if(_expSceneManager._isInTrial && _expManager._taskNum != 0)
             {
                 string tgstr = targetHit == null ? "null" : targetHit.targetIndex.ToString();
                 Vector3 pos = targetHit == null ? Vector3.zero : targetHit.transform.position;
@@ -272,7 +272,7 @@ public class RaycastingTool : MonoBehaviour
     {
         _grabbedObj = FindTargetSphere();
 
-        if(_expSceneManager._isInTrial)
+        if(_expSceneManager._isInTrial && _expManager._taskNum != 0)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
             Vector3[] v = {((CubeSceneManager)_expSceneManager).GetTargetPosition(), ((CubeSceneManager)_expSceneManager).GetGoalOffset()};
@@ -303,7 +303,7 @@ public class RaycastingTool : MonoBehaviour
 
     protected void GrabEnd()
     {
-        if(_expSceneManager._isInTrial)
+        if(_expSceneManager._isInTrial && _expManager._taskNum == 2)
         {
             string objstr = _grabbedObj == null ? "null" : _grabbedObj.targetIndex.ToString();
             Vector3[] v = {((CubeSceneManager)_expSceneManager).GetTargetPosition(), ((CubeSceneManager)_expSceneManager).GetGoalOffset()};
