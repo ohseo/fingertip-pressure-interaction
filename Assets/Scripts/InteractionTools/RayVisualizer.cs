@@ -61,6 +61,57 @@ public class RayVisualizer : MonoBehaviour
         // _lineRenderer.SetPosition(1, ray.origin + ray.direction * _rayLength);
     }
 
+    public void SetRayMode(int mode)
+    {
+        switch(mode)
+        {
+            case 1:
+                _precisePointingColorGradient = new Gradient();
+                _precisePointingColorGradient.SetKeys(
+                    new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.0f, 0.0f), 0.0f),
+                            new GradientColorKey(new Color(0.90f, 0.20f, 0.20f), 1.0f) },
+                    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+                );
+                _preciseDraggingColorGradient = new Gradient();
+                _preciseDraggingColorGradient.SetKeys(
+                    new GradientColorKey[] { new GradientColorKey(new Color(0.90f, 0.0f, 0.0f), 0.0f),
+                            new GradientColorKey(new Color(0.90f, 0.0f, 0.0f), 1.0f) },
+                    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+                );
+                break;
+            case 2:
+                _precisePointingColorGradient = new Gradient();
+                _precisePointingColorGradient.SetKeys(
+                    new GradientColorKey[] { new GradientColorKey(new Color(0.0f, 0.90f, 0.0f), 0.0f),
+                            new GradientColorKey(new Color(0.20f, 0.90f, 0.20f), 1.0f) },
+                    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+                );
+                _preciseDraggingColorGradient = new Gradient();
+                _preciseDraggingColorGradient.SetKeys(
+                    new GradientColorKey[] { new GradientColorKey(new Color(0.0f, 0.90f, 0.0f), 0.0f),
+                            new GradientColorKey(new Color(0.0f, 0.90f, 0.0f), 1.0f) },
+                    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+                );
+                break;
+            case 3:
+                _precisePointingColorGradient = new Gradient();
+                _precisePointingColorGradient.SetKeys(
+                    new GradientColorKey[] { new GradientColorKey(new Color(0.0f, 0.0f, 0.90f), 0.0f),
+                            new GradientColorKey(new Color(0.20f, 0.20f, 0.90f), 1.0f) },
+                    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+                );
+                _preciseDraggingColorGradient = new Gradient();
+                _preciseDraggingColorGradient.SetKeys(
+                    new GradientColorKey[] { new GradientColorKey(new Color(0.0f, 0.0f, 0.90f), 0.0f),
+                            new GradientColorKey(new Color(0.0f, 0.0f, 0.90f), 1.0f) },
+                    new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+                );
+                break;
+            default:
+                break;
+        }
+    }
+
     public void SetRayState(RayModifyingTool.RayState state)
     {
         switch(state)

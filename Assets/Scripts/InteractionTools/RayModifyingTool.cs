@@ -131,6 +131,11 @@ public class RayModifyingTool : RaycastingTool
                 updateCastedRayDelegate = null;
                 break;
         }
+
+        if(_rayVisualizer != null && _expManager._taskNum != 0)
+        {
+            _rayVisualizer.SetRayMode(mode);
+        }
     }
 
     private void CDGainRay(bool prevIsPreciseMode, bool currIsPreciseMode)
