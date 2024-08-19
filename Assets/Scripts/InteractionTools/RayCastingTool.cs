@@ -80,7 +80,7 @@ public class RaycastingTool : MonoBehaviour
             _parentTransform = gameObject.transform;
         }
         IsRightHandedTool = true;   // TODO: Connect to tool creator later
-        _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
+        // _text = GameObject.Find("Canvas/InteractionToolState").GetComponent<TextMeshProUGUI>();
         // SetExpMode(_expManager._taskNum);
 
         OVRCameraRig cameraRig = FindObjectOfType<OVRCameraRig>();
@@ -104,7 +104,7 @@ public class RaycastingTool : MonoBehaviour
         transform.rotation = pointer.rotation;
 
         _forceStateModule.UpdateState(_hand, _forceLevelManager.forceLevel);
-        _text.text = _forceStateModule.currentForceState.ToString();
+        // _text.text = _forceStateModule.currentForceState.ToString();
 
         _prevIsPinching = _currIsPinching;
         _currIsPinching = _forceStateModule.IsPinching;
