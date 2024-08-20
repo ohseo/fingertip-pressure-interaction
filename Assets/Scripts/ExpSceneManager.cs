@@ -73,7 +73,7 @@ public class ExpSceneManager : MonoBehaviour
             _targetDepth = 1.0f;
         } else if(targetDepth == 2)
         {
-            _targetDepth = 2.0f;
+            _targetDepth = 1.5f;
         }
     }
 
