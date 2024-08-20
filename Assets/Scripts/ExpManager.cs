@@ -36,6 +36,7 @@ public class ExpManager : MonoBehaviour
         } else if(_taskNum == 2)
         {
             CubeSceneManager csm = sceneGO.AddComponent<CubeSceneManager>();
+            csm.SetDominantHand(_isRightHanded);
             _expSceneManager = (ExpSceneManager)csm;
         } else
         {

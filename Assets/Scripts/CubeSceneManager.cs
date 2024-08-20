@@ -14,7 +14,7 @@ public class CubeSceneManager : ExpSceneManager
 {
     private const float GOAL_POSITION_DEG = 10f;
     private const float TARGET_POSITION_DEG = 10f;
-    private const float VERTICAL_CENTER_OFFSET = -10.0f;
+    private const float VERTICAL_CENTER_OFFSET = 10.0f;
     private GameObject _target;
     private GameObject _goal;
     private Vector3 _goalOffset;
@@ -97,7 +97,13 @@ public class CubeSceneManager : ExpSceneManager
         }
 
         Vector3 targetPosition = new Vector3();
-        targetPosition.x = Mathf.Sin(-TARGET_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
+        if(_isRightHanded)
+        {
+            targetPosition.x = Mathf.Sin(-TARGET_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
+        } else
+        {
+            targetPosition.x = Mathf.Sin(TARGET_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
+        }
         targetPosition.y = Mathf.Sin(VERTICAL_CENTER_OFFSET * Mathf.Deg2Rad)*_targetDepth;
         targetPosition.z = Mathf.Cos(TARGET_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
 
@@ -108,10 +114,16 @@ public class CubeSceneManager : ExpSceneManager
 
     private void GenerateGoalCube()
     {
-        float x = Mathf.Sin(GOAL_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
-        float y = Mathf.Sin(VERTICAL_CENTER_OFFSET * Mathf.Deg2Rad)*_targetDepth;
-        float z = Mathf.Cos(GOAL_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
-        Vector3 pos = new Vector3(x, y, z);
+        Vector3 pos = new Vector3();
+        if(_isRightHanded)
+        {
+            pos.x = Mathf.Sin(GOAL_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
+        } else
+        {
+            pos.x = Mathf.Sin(-GOAL_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
+        }
+        pos.y = Mathf.Sin(VERTICAL_CENTER_OFFSET * Mathf.Deg2Rad)*_targetDepth;
+        pos.z = Mathf.Cos(GOAL_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
         GameObject cube = Instantiate(goalCubePrefab, pos, Quaternion.identity);
         cube.transform.localScale *= TARGET_SIZE;
         _goal = cube;

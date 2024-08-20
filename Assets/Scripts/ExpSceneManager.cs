@@ -22,9 +22,10 @@ public class ExpSceneManager : MonoBehaviour
     protected bool _forceSetAndTrial = false;
     protected int _currentTrial = 1;
     protected int _currentSet = 1;
+    protected bool _isRightHanded = true;
 
     protected const float TIME_OUT_THRESHOLD = 20.0f;
-    protected const int MAX_TRIAL_NUM = 2;
+    protected const int MAX_TRIAL_NUM = 6;
     protected const int MAX_SET_NUM = 3;
     protected GameObject _center;
     protected float _trialDuration;
@@ -74,6 +75,11 @@ public class ExpSceneManager : MonoBehaviour
         {
             _targetDepth = 2.0f;
         }
+    }
+
+    public void SetDominantHand(bool b)
+    {
+        _isRightHanded = b;
     }
 
     public void ForceSetAndTrial(bool b, int setNum, int trialNum)
