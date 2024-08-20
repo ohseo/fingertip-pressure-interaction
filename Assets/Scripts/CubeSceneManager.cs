@@ -14,7 +14,7 @@ public class CubeSceneManager : ExpSceneManager
 {
     private const float GOAL_POSITION_DEG = 10f;
     private const float TARGET_POSITION_DEG = 10f;
-    private const float VERTICAL_CENTER_OFFSET = 10.0f;
+    private const float VERTICAL_CENTER_OFFSET = 0.0f;
     private GameObject _target;
     private GameObject _goal;
     private Vector3 _goalOffset;
@@ -126,6 +126,7 @@ public class CubeSceneManager : ExpSceneManager
         pos.z = Mathf.Cos(GOAL_POSITION_DEG * Mathf.Deg2Rad)*_targetDepth;
         GameObject cube = Instantiate(goalCubePrefab, pos, Quaternion.identity);
         cube.transform.localScale *= TARGET_SIZE;
+        cube.transform.Rotate(-7f, -7f, 0f);
         _goal = cube;
         _goalInPreTrigger = new UnityAction(OnGoalIn);
         _goalOutPreTrigger = new UnityAction(OnGoalOut);
