@@ -27,8 +27,8 @@ public class RayVisualizer : MonoBehaviour
         );
         _coarseDraggingColorGradient = new Gradient();
         _coarseDraggingColorGradient.SetKeys(
-            new GradientColorKey[] { new GradientColorKey(new Color(0.0f, 0.90f, 0.90f), 0.0f),
-                    new GradientColorKey(new Color(0.0f, 0.90f, 0.90f), 1.0f) },
+            new GradientColorKey[] { new GradientColorKey(new Color(1f, 1f, 1f), 0.0f),
+                    new GradientColorKey(new Color(1f, 1f, 1f), 1.0f) },
             new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
         );
         _precisePointingColorGradient = new Gradient();

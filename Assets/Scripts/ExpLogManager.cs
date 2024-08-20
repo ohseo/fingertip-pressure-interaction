@@ -148,7 +148,7 @@ public class ExpLogManager : MonoBehaviour
         _genEventStr = _taskNum == 1 ? GenerateEventStringTask1 : GenerateEventStringTask2;
         _genSumStr = _taskNum == 1 ? GenerateSummaryStringTask1 : GenerateSummaryStringTask2;
         _genStreamStr = _taskNum == 1 ? GenerateStreamStringTask1 : GenerateStreamStringTask2;
-        baseDirectoryPath = Application.dataPath;
+        baseDirectoryPath = "D:";
         dataDirectoryPath = "/Data/";
         CreateNewFile();
         // ResetValues();
