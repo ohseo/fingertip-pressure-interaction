@@ -45,7 +45,7 @@ public class ExpManager : MonoBehaviour
         }
 
         _expSceneManager.SetPrefabs(targetSpherePrefab, goalCubePrefab);
-        _expSceneManager.SetExpConditions(_targetDepthCondition);
+        _expSceneManager.SetExpConditions(_targetDepthCondition, _taskNum);
         if(_forceSetAndTrial)
         {
             _expSceneManager.ForceSetAndTrial(_forceSetAndTrial, _forceSetNum, _forceTrialNum);

@@ -164,6 +164,9 @@ public class ForceStateModule
                             if(_taskNum != 2)
                             {
                                 _currForceState = ForceState.SoftDown;
+                            } else if(_taskNum == 2)
+                            {
+                                _currForceState = ForceState.NoneDown;
                             }
                         } else if (forceLevel == "2")
                         {
@@ -251,7 +254,13 @@ public class ForceStateModule
                         // _currForceState = ForceState.NoneDown; //advantage entering coarse dragging state
                     // } else
                     // {
+                    if (forceLevel == "1" && _taskNum != 2)
+                    {
+                        _currForceState = ForceState.SoftDown;
+                    } else
+                    {
                         _currForceState = ForceState.HardStay;
+                    }
                     // }
                 }
                 else

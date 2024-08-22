@@ -25,7 +25,7 @@ public class ExpSceneManager : MonoBehaviour
     protected bool _isRightHanded = true;
 
     protected const float TIME_OUT_THRESHOLD = 20.0f;
-    protected const int MAX_TRIAL_NUM = 6;
+    protected const int MAX_TRIAL_NUM = 5;
     protected const int MAX_SET_NUM = 3;
     protected GameObject _center;
     protected float _trialDuration;
@@ -66,12 +66,15 @@ public class ExpSceneManager : MonoBehaviour
         goalCubePrefab = cube;
     }
 
-    public void SetExpConditions(int targetDepth)
+    public void SetExpConditions(int targetDepth, int taskNum)
     {
         if(targetDepth == 1)
         {
             _targetDepth = 1.0f;
-        } else if(targetDepth == 2)
+        } else if(targetDepth == 2 && taskNum == 1)
+        {
+            _targetDepth = 2.0f;
+        } else if(targetDepth == 2 && taskNum == 2)
         {
             _targetDepth = 1.5f;
         }
