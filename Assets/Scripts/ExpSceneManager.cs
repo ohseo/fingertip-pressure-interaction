@@ -24,7 +24,7 @@ public class ExpSceneManager : MonoBehaviour
     protected int _currentSet = 1;
     protected bool _isRightHanded = true;
 
-    protected const float TIME_OUT_THRESHOLD = 20.0f;
+    protected const float TIME_OUT_THRESHOLD = 100.0f;
     protected const int MAX_TRIAL_NUM = 5;
     protected const int MAX_SET_NUM = 3;
     protected GameObject _center;

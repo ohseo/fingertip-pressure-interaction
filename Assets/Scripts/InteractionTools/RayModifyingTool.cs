@@ -34,6 +34,7 @@ public class RayModifyingTool : RaycastingTool
         }
     }
 
+    // private static float[] CD_GAINS = {0.29f, 0.038f, 0.025f};
     private static float[] CD_GAINS = {0.29f, 0.038f, 0.025f};
     private float _cdGain = 0.038f;
     public int _raycastingMode = 4;
@@ -132,7 +133,7 @@ public class RayModifyingTool : RaycastingTool
                 break;
         }
 
-        if(_rayVisualizer != null && _expManager._taskNum != 0)
+        if(_rayVisualizer != null)// && _expManager._taskNum != 0)
         {
             _rayVisualizer.SetRayMode(mode);
         }

@@ -30,15 +30,15 @@ public class PracticeSceneManager : ExpSceneManager
 
     protected override void GenerateTargets()
     {
-        GameObject target1 = Instantiate(targetSpherePrefab, new Vector3(0.1f, 0f, 1f), Quaternion.identity);
+        GameObject target1 = Instantiate(targetSpherePrefab, new Vector3(0.1f, 0f, 1.5f), Quaternion.identity);
         target1.transform.localScale *= TARGET_SIZE;
         target1.GetComponent<TargetSphere>().IsExpTarget = true;
 
-        GameObject target2 = Instantiate(targetSpherePrefab, new Vector3(-0.1f, 0f, 1f), Quaternion.identity);
+        GameObject target2 = Instantiate(targetSpherePrefab, new Vector3(-0.1f, 0f, 1.5f), Quaternion.identity);
         target2.transform.localScale *= TARGET_SIZE;
         target2.GetComponent<TargetSphere>().IsExpTarget = true;
 
-        GameObject sphere = Instantiate(targetSpherePrefab, new Vector3(-0.105f, -0.01f, 0.99f), Quaternion.identity);
-        sphere.transform.localScale *= TARGET_SIZE;
+        // GameObject sphere = Instantiate(targetSpherePrefab, new Vector3(-0.105f, -0.01f, 0.99f), Quaternion.identity);
+        // sphere.transform.localScale *= TARGET_SIZE;
     }
 }
